@@ -8,6 +8,24 @@
 
 **Techniques:** 7-day repeat contacts via an **index self-join** in Power Query, agent tenure at call time, two fact tables (calls and agent logins) sharing dimensions, and NPS that handles blank survey answers correctly.
 
+## Report pages
+
+**Service Overview**
+
+![Service Overview](screenshots/page1_overview.png)
+
+**Demand & Staffing**
+
+![Demand & Staffing](screenshots/page2_demand.png)
+
+**Agent Performance**
+
+![Agent Performance](screenshots/page3_agents.png)
+
+**Customer Experience**
+
+![Customer Experience](screenshots/page4_cx.png)
+
 ## Findings
 * Service level **75.5%** vs 80% target: **63% on Sundays** and **43% in Ramadan** (13% after 9 pm), because shifts are planned for an average day.
 * New agents (0-6 months): AHT 459s vs 375s and FCR 62% vs 72%.

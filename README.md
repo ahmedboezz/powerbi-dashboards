@@ -27,6 +27,26 @@ Eleven Power BI reports built on star-schema models with DAX measures. They are 
 
 > **About the data:** all datasets are simulated to mirror real business systems and include realistic data-quality issues. Company names are fictional. My client work can't be published, so these projects rebuild the same kind of business problems with data I can share.
 
+## Preview
+
+### E-Commerce Sales
+![E-Commerce Sales](01-ecommerce-sales/screenshots/powerbi_page1_overview.png)
+
+### Loan Portfolio & Credit Risk
+![Loan Portfolio & Credit Risk](07-loan-portfolio-credit-risk/screenshots/page1_overview.png)
+
+### Contact Centre Performance
+![Contact Centre Performance](08-contact-center-cx/screenshots/page1_overview.png)
+
+### Digital Marketing Performance
+![Digital Marketing Performance](09-digital-marketing-roi/screenshots/page1_overview.png)
+
+### Fleet Operations & Maintenance
+![Fleet Operations & Maintenance](10-fleet-maintenance/screenshots/page1_overview.png)
+
+### Construction Portfolio (EVM)
+![Construction Portfolio (EVM)](11-construction-evm/screenshots/page1_portfolio.png)
+
 More projects: [Excel](https://github.com/ahmedsalamsali/excel-dashboards) · [SQL](https://github.com/ahmedsalamsali/sql-projects) · [Python](https://github.com/ahmedsalamsali/python-data-analysis)
 
 ---

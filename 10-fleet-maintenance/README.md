@@ -8,6 +8,24 @@
 
 **Techniques:** telematics cleaning (duplicates, negative odometer deltas), chained merges for fuel cost, period-aware denominators (`COUNTROWS('Date')`), ranked replacement list.
 
+## Report pages
+
+**Fleet Overview**
+
+![Fleet Overview](screenshots/page1_overview.png)
+
+**Maintenance**
+
+![Maintenance](screenshots/page2_maintenance.png)
+
+**Fuel & Drivers**
+
+![Fuel & Drivers](screenshots/page3_fuel.png)
+
+**Replacement Planning**
+
+![Replacement Planning](screenshots/page4_replacement.png)
+
 ## Findings
 * Vehicles 7+ years old cost **1.04 SAR/km** to maintain vs 0.45 for 0-3 years.
 * The branch with a **45% preventive share** (vs ~65% elsewhere) has the lowest availability.

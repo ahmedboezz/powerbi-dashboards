@@ -8,6 +8,24 @@
 
 **Techniques:** one rename map + `MissingField.Ignore` to combine Google / Meta / other ad exports with different schemas, unpivoted funnel, channel-relative spend bands (diminishing returns) and a **what-if parameter**.
 
+## Report pages
+
+**Marketing Overview**
+
+![Marketing Overview](screenshots/page1_overview.png)
+
+**Channel Efficiency**
+
+![Channel Efficiency](screenshots/page2_channels.png)
+
+**Website Funnel**
+
+![Website Funnel](screenshots/page3_funnel.png)
+
+**Budget & What-if**
+
+![Budget & What-if](screenshots/page4_budget.png)
+
 ## Findings
 * Total spend SAR 26.3M at **ROAS 3.40x**. Google Search 5.33x vs Display 1.64x.
 * Diminishing returns: ROAS 4.12x on low-spend days vs 2.39x when daily spend doubles.

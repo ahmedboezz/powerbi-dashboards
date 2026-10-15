@@ -8,6 +8,20 @@
 
 **Techniques:** running totals with `FILTER(ALL('Date'))`, **project-level EAC with SUMX + context transition**, ERP period parsing, probability × impact risk matrix.
 
+## Report pages
+
+**Portfolio Overview**
+
+![Portfolio Overview](screenshots/page1_portfolio.png)
+
+**Project Health**
+
+![Project Health](screenshots/page2_health.png)
+
+**Change Orders & Risks**
+
+![Change Orders & Risks](screenshots/page3_changerisk.png)
+
 ## Findings
 * 24 projects, BAC SAR 3.61B: **CPI 0.93, SPI 0.95**, forecast overrun **SAR 290M**.
 * Material price shock: monthly CPI fell from 0.96 to 0.90 after April 2025.

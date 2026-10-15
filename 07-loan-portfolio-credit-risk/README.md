@@ -10,6 +10,24 @@ Risk-committee dashboard for a Saudi consumer-finance company: portfolio size, N
 
 **Techniques:** folder ingestion, record-based mapping tables, previous-month bucket via self-merge (roll rates), **semi-additive balance measures**, `TREATAS` virtual relationship for originations, `KEEPFILTERS`, IFRS 9 staging.
 
+## Report pages
+
+**Portfolio Overview**
+
+![Portfolio Overview](screenshots/page1_overview.png)
+
+**Credit Risk Drivers**
+
+![Credit Risk Drivers](screenshots/page2_riskdrivers.png)
+
+**Vintage & Roll Rates**
+
+![Vintage & Roll Rates](screenshots/page3_vintage.png)
+
+**Collections & IFRS 9**
+
+![Collections & IFRS 9](screenshots/page4_collections.png)
+
 ## Findings
 * NPL rose from **2.5% to 4.9%** in 2025 (PAR30 7.6%) on a SAR 740M book.
 * The **H2-2024 growth-campaign vintage** reached 13.7% 30+ DPD at month 12 vs 9.4% for the previous vintage.
