@@ -1,0 +1,40 @@
+table Products
+	lineageTag: e666eed4-17a8-58ed-b159-d8823102d9ce
+
+	column Product
+		dataType: string
+		lineageTag: db016032-7846-5367-9496-6be7db123442
+		summarizeBy: none
+		sourceColumn: Product
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: string
+		lineageTag: 369aa4e6-79cd-5aa2-8779-c362a23d619f
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column UnitPrice
+		dataType: double
+		formatString: \$#,0.00
+		lineageTag: 1bdaaf3a-5268-5e2e-b543-b0fb703312dc
+		summarizeBy: sum
+		sourceColumn: UnitPrice
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Products = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "products.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"Product", type text}, {"Category", type text}, {"UnitPrice", type number}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,25 @@
+ProjectID,ProjectName,Sector,ClientType,City,ProjectManager,ContractValue,BAC,PlannedStart,PlannedFinish
+PRJ-001,Residential Compound - Abha #1,Residential,Semi-Government,Abha,PM-04,"47,400,000",39500000.0,2025-03-01,2027-01-31
+PRJ-002,Mixed-use Tower - Dammam #2,Commercial,Private,Dammam,PM-07,"238,700,000",202700000.0,2023-09-01,2026-01-31
+PRJ-003,Road & Bridge Package - Jeddah #3,Infrastructure,Government,Jeddah,PM-02,"101,000,000",86300000.0,2023-08-01,2026-01-31
+PRJ-004,Hospital Expansion - Tabuk #4,Healthcare,Government,Tabuk,PM-05,"73,800,000",63600000.0,2024-05-01,2026-02-28
+PRJ-005,School Complex - Riyadh #5,Education,Government,Riyadh,PM-08,"54,600,000",44800000.0,2024-05-01,2026-05-31
+PRJ-006,Residential Compound - Dammam #6,Residential,Semi-Government,Dammam,PM-03,"397,500,000",342500000.0,2023-11-01,2026-04-30
+PRJ-007,Mixed-use Tower - Dammam #7,Commercial,Semi-Government,Dammam,PM-06,"35,800,000",29800000.0,2023-12-01,2024-11-30
+PRJ-008,Road & Bridge Package - Jeddah #8,Infrastructure,Government,Jeddah,PM-01,"24,800,000",21700000.0,2025-05-01,2027-02-28
+PRJ-009,Hospital Expansion - Makkah #9,Healthcare,Semi-Government,Makkah,PM-04,"65,300,000",56000000.0,2025-03-01,2027-04-30
+PRJ-010,School Complex - Jeddah #10,Education,Government,Jeddah,PM-07,"110,500,000",92400000.0,2024-04-01,2025-09-30
+PRJ-011,Residential Compound - Abha #11,Residential,Semi-Government,Abha,PM-02,"42,100,000",35800000.0,2025-01-01,2027-06-30
+PRJ-012,Mixed-use Tower - Riyadh #12,Commercial,Semi-Government,Riyadh,PM-05,"140,900,000",116100000.0,2024-04-01,2025-11-30
+PRJ-013,Road & Bridge Package - Riyadh #13,Infrastructure,Government,Riyadh,PM-08,"53,600,000",46400000.0,2023-09-01,2024-08-31
+PRJ-014,Hospital Expansion - Tabuk #14,Healthcare,Private,Tabuk,PM-03,"155,600,000",131400000.0,2024-09-01,2026-03-31
+PRJ-015,School Complex - Madinah #15,Education,Government,Madinah,PM-06,"448,900,000",372700000.0,2025-04-01,2027-05-31
+PRJ-016,Residential Compound - Makkah #16,Residential,Private,Makkah,PM-01,"267,600,000",230700000.0,2024-08-01,2026-05-31
+PRJ-017,Mixed-use Tower - Dammam #17,Commercial,Semi-Government,Dammam,PM-04,"97,300,000",84800000.0,2025-05-01,2027-09-30
+PRJ-018,Road & Bridge Package - Tabuk #18,Infrastructure,Government,Tabuk,PM-07,"334,100,000",277500000.0,2023-11-01,2024-11-30
+PRJ-019,Hospital Expansion - Abha #19,Healthcare,Private,Abha,PM-02,"212,300,000",178000000.0,2025-04-01,2027-01-31
+PRJ-020,School Complex - Madinah #20,Education,Government,Madinah,PM-05,"141,900,000",122700000.0,2025-01-01,2026-01-31
+PRJ-021,Residential Compound - NEOM Region #21,Residential,Semi-Government,NEOM Region,PM-08,"112,600,000",97200000.0,2023-11-01,2025-07-31
+PRJ-022,School Complex - NEOM Region #22,Education,Government,NEOM Region,PM-03,"135,500,000",117900000.0,2023-11-01,2025-02-28
+PRJ-023,Residential Compound - Abha #23,Residential,Private,Abha,PM-06,"481,900,000",423600000.0,2025-01-01,2026-12-31
+PRJ-024,Mixed-use Tower - Makkah #24,Commercial,Private,Makkah,PM-01,"485,300,000",398200000.0,2024-09-01,2025-11-30

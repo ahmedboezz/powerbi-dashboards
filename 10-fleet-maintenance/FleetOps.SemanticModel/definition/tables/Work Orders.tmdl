@@ -1,0 +1,121 @@
+/// Maintenance work orders (preventive, corrective, accident)
+table 'Work Orders'
+	lineageTag: 412e1fb6-b9c8-5a88-b0b2-8076a9998759
+
+	column WorkOrderID
+		dataType: string
+		lineageTag: eccbab3c-8575-5e86-8986-21006531f7a5
+		summarizeBy: none
+		sourceColumn: WorkOrderID
+
+		annotation SummarizationSetBy = Automatic
+
+	column VehicleID
+		dataType: string
+		lineageTag: 6bedba3f-8ae9-560d-b418-0f300d310010
+		summarizeBy: none
+		sourceColumn: VehicleID
+
+		annotation SummarizationSetBy = Automatic
+
+	column WorkType
+		dataType: string
+		lineageTag: d774e876-29da-5107-b7ff-eeb49bf941d1
+		summarizeBy: none
+		sourceColumn: WorkType
+
+		annotation SummarizationSetBy = Automatic
+
+	column System
+		dataType: string
+		lineageTag: 5cffb2a8-5563-5c3e-9617-f82024b0c1bb
+		summarizeBy: none
+		sourceColumn: System
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: d57e4287-bc91-57ea-88c4-eb72539ceafb
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column OpenDate
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 332941ec-fa51-5a0b-9385-51eda52a5527
+		summarizeBy: none
+		sourceColumn: OpenDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column CloseDate
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 03a3f594-8133-5521-84c4-bbcde8dd2418
+		summarizeBy: none
+		sourceColumn: CloseDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column PartsCost
+		dataType: double
+		formatString: #,0
+		lineageTag: bec7851e-d09f-5376-8748-04f30b7ec38f
+		summarizeBy: sum
+		sourceColumn: PartsCost
+
+		annotation SummarizationSetBy = Automatic
+
+	column LaborCost
+		dataType: double
+		formatString: #,0
+		lineageTag: 08b00ba6-fae7-5c59-b25e-5d8233caa170
+		summarizeBy: sum
+		sourceColumn: LaborCost
+
+		annotation SummarizationSetBy = Automatic
+
+	column TotalCost
+		dataType: double
+		formatString: #,0
+		lineageTag: efcd4b26-220d-5787-8a36-f59598f6bcbc
+		summarizeBy: sum
+		sourceColumn: TotalCost
+
+		annotation SummarizationSetBy = Automatic
+
+	column DowntimeHours
+		dataType: double
+		formatString: #,0
+		lineageTag: aa8af0f8-844e-553a-bd92-ce3ee5762f07
+		summarizeBy: sum
+		sourceColumn: DowntimeHours
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Work Orders' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "work_orders_2025.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    SysMap = [#"a/c" = "AC & Cooling", ac = "AC & Cooling", cooling = "AC & Cooling", #"ac & cooling" = "AC & Cooling", brake = "Brakes",
+				              brakes = "Brakes", tyres = "Tires", tires = "Tires", engine = "Engine"],
+				    Sys = Table.TransformColumns(Promoted, {{"System", each Record.FieldOrDefault(SysMap, Text.Lower(Text.Trim(_)), _), type text},
+				            {"PartsCost", each Number.From(Text.Select(_, {"0".."9", "."}), "en-US"), type number},
+				            {"OpenDate", each Date.FromText(_, [Format = "dd/MM/yyyy"]), type date},
+				            {"CloseDate", each if _ = "" then null else Date.FromText(_, [Format = "dd/MM/yyyy"]), type date}}),
+				    Typed = Table.TransformColumnTypes(Sys, {{"LaborCost", type number}, {"DowntimeHours", type number}}, "en-US"),
+				    Total = Table.AddColumn(Typed, "TotalCost", each [PartsCost] + [LaborCost], type number),
+				    Status = Table.AddColumn(Total, "Status", each if [CloseDate] = null then "Open" else "Closed", type text)
+				in
+				    Status
+
+	annotation PBI_ResultType = Table

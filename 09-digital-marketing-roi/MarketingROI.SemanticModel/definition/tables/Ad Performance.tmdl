@@ -1,0 +1,92 @@
+/// Daily ad-platform results per campaign (Google, Meta, Snapchat, TikTok, X, influencers, CRM)
+table 'Ad Performance'
+	lineageTag: 5bcda962-21a7-50ea-9e3a-f498b4c43c0d
+
+	column Date
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 1bd56b54-1940-5678-bdd5-94b2517cb8d3
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column CampaignID
+		dataType: string
+		lineageTag: 3aa919c2-3cf9-57f8-bcc4-a46c1cbd2f6d
+		summarizeBy: none
+		sourceColumn: CampaignID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Impressions
+		dataType: int64
+		formatString: #,0
+		lineageTag: 30e29422-7180-598b-9cb8-8cb6976e3a0a
+		summarizeBy: sum
+		sourceColumn: Impressions
+
+		annotation SummarizationSetBy = Automatic
+
+	column Clicks
+		dataType: int64
+		formatString: #,0
+		lineageTag: 83babc31-3771-54ad-aa35-05d68234dc75
+		summarizeBy: sum
+		sourceColumn: Clicks
+
+		annotation SummarizationSetBy = Automatic
+
+	column Conversions
+		dataType: int64
+		formatString: #,0
+		lineageTag: 5af6b9f3-44ae-5379-8e13-a8517bf2f403
+		summarizeBy: sum
+		sourceColumn: Conversions
+
+		annotation SummarizationSetBy = Automatic
+
+	column Spend
+		dataType: double
+		formatString: #,0
+		lineageTag: 9394ef2f-afff-5275-b027-2b298459c3b7
+		summarizeBy: sum
+		sourceColumn: Spend
+
+		annotation SummarizationSetBy = Automatic
+
+	column Revenue
+		dataType: double
+		formatString: #,0
+		lineageTag: 35ce581a-3dbf-5139-8814-a980379c55c4
+		summarizeBy: sum
+		sourceColumn: Revenue
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Ad Performance' = m
+		mode: import
+		source =
+				let
+				    Source = Folder.Files(DataFolder & "ad_exports"),
+				    Csvs = Table.SelectRows(Source, each [Extension] = ".csv"),
+				    // every platform exports different column names -> one rename map, missing fields ignored
+				    Rename = {{"Day", "Date"}, {"Campaign ID", "CampaignID"}, {"Impr.", "Impressions"}, {"Link Clicks", "Clicks"}, {"Cost", "Spend"},
+				              {"Amount Spent (SAR)", "Spend"}, {"Purchases", "Conversions"}, {"Conv. value", "Revenue"}, {"Purchase Value", "Revenue"}},
+				    Data = Table.AddColumn(Csvs, "Data", each Table.RenameColumns(Table.PromoteHeaders(
+				             Csv.Document([Content], [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]), [PromoteAllScalars = true]),
+				             Rename, MissingField.Ignore)),
+				    Combined = Table.Combine(Data[Data]),
+				    Dedup = Table.Distinct(Combined, {"Date", "CampaignID"}),
+				    // ISO dates (Google, others) and dd/MM/yyyy (Meta)
+				    Dates = Table.TransformColumns(Dedup, {{"Date", each if Text.Contains(_, "/") then Date.FromText(_, [Format = "dd/MM/yyyy"])
+				              else Date.FromText(_, [Format = "yyyy-MM-dd"]), type date}}),
+				    Spend = Table.TransformColumns(Dates, {{"Spend", each Number.From(Text.Select(_, {"0".."9", "."}), "en-US"), type number}}),
+				    Typed = Table.TransformColumnTypes(Spend, {{"Impressions", Int64.Type}, {"Clicks", Int64.Type}, {"Conversions", Int64.Type},
+				              {"Revenue", type number}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

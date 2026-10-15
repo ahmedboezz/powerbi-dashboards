@@ -1,0 +1,8 @@
+relationship c766eb42-6d20-5fb7-8c29-8941f78a8cf7
+	fromColumn: Applications.Product
+	toColumn: Products.Product
+
+relationship 5cc377ef-d396-5090-9e19-f1cfd53152cd
+	fromColumn: Applications.ApplicationDate
+	toColumn: Date.Date
+

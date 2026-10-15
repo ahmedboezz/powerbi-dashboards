@@ -1,0 +1,4 @@
+relationship 49698e7f-6df3-5e6c-9f24-ed3f2bb118d1
+	fromColumn: Employees.ExitDate
+	toColumn: Date.Date
+

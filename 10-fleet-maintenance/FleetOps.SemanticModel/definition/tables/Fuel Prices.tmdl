@@ -1,0 +1,31 @@
+table 'Fuel Prices'
+	lineageTag: e73ee283-caa0-5df7-84ec-15e7a1281bad
+
+	column FuelType
+		dataType: string
+		lineageTag: abe6aa17-716c-5c8b-9d8a-0fd80bd9c9ff
+		summarizeBy: none
+		sourceColumn: FuelType
+
+		annotation SummarizationSetBy = Automatic
+
+	column PricePerLiter
+		dataType: double
+		formatString: 0.00
+		lineageTag: 59bc381f-0cc5-5e1f-8bb2-2630d98b1f47
+		summarizeBy: none
+		sourceColumn: PricePerLiter
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Fuel Prices' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "fuel_prices.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Result = Table.TransformColumnTypes(Promoted, {{"PricePerLiter", type number}}, "en-US")
+				in
+				    Result
+
+	annotation PBI_ResultType = Table

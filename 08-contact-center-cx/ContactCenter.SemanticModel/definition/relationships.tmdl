@@ -1,0 +1,19 @@
+relationship bab26b9a-7076-51e5-b416-b49a75dbc75b
+	fromColumn: Calls.CallDate
+	toColumn: Date.Date
+
+relationship 40a3b276-ee75-56d2-91d3-01fb6494ae3b
+	fromColumn: Calls.AgentID
+	toColumn: Agents.AgentID
+
+relationship 7008cc9f-4c58-56d0-8162-618cb403f3c6
+	fromColumn: Calls.Queue
+	toColumn: Queues.QueueName
+
+relationship c717d828-d9d8-558d-a55b-1d24c7648c71
+	fromColumn: 'Agent Logins'.AgentID
+	toColumn: Agents.AgentID
+
+relationship aad83c43-44ff-58c2-9825-8c6e110f4dc5
+	fromColumn: 'Agent Logins'.Date
+	toColumn: Date.Date

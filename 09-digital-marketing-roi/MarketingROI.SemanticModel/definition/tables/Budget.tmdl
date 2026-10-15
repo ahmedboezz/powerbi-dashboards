@@ -1,0 +1,43 @@
+table Budget
+	lineageTag: 809cac10-6e0a-54b1-8f8a-f68cce769971
+
+	column Month
+		dataType: dateTime
+		formatString: mmm yyyy
+		lineageTag: 42d86ae0-11fa-5ccc-b2d3-98bbd0a81318
+		summarizeBy: none
+		sourceColumn: Month
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Channel
+		dataType: string
+		lineageTag: c9039c76-9122-5952-ad74-b0119f9bb0a0
+		summarizeBy: none
+		sourceColumn: Channel
+
+		annotation SummarizationSetBy = Automatic
+
+	column PlannedBudget
+		dataType: double
+		formatString: #,0
+		lineageTag: cc085c98-6deb-5f0d-875d-0b46c1957eb3
+		summarizeBy: sum
+		sourceColumn: PlannedBudget
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Budget = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "budget_plan_2025.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+
+				    Result = Table.TransformColumnTypes(Promoted, {{"Month", type date}, {"PlannedBudget", type number}}, "en-US")
+				in
+				    Result
+
+	annotation PBI_ResultType = Table

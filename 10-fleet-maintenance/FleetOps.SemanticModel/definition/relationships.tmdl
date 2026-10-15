@@ -1,0 +1,19 @@
+relationship 69d96836-6327-588c-bc2d-7ed66c364ccc
+	fromColumn: Trips.VehicleID
+	toColumn: Vehicles.VehicleID
+
+relationship d97d6c59-d6f1-567d-bb7a-6fc973c4ae0d
+	fromColumn: Trips.DriverID
+	toColumn: Drivers.DriverID
+
+relationship 162c9ba3-4a28-5d0b-ad21-57c3d00ea90b
+	fromColumn: Trips.Date
+	toColumn: Date.Date
+
+relationship 401c8fec-0320-5d3d-84b6-6ff02790b44f
+	fromColumn: 'Work Orders'.VehicleID
+	toColumn: Vehicles.VehicleID
+
+relationship 733196e0-f14c-5a14-883c-ab3c9364017f
+	fromColumn: 'Work Orders'.OpenDate
+	toColumn: Date.Date

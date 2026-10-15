@@ -1,0 +1,112 @@
+table _Measures
+	lineageTag: b91f61c3-2ce2-5851-a164-812972f2a7d4
+
+	measure Admissions = COUNTROWS ( Admissions )
+		formatString: #,0
+		displayFolder: 1 Volume
+		lineageTag: 43cdc857-0f87-5283-a88a-9e5b408b72a4
+
+	measure 'Patient Days' = SUM ( Admissions[LengthOfStay] )
+		formatString: #,0
+		displayFolder: 1 Volume
+		lineageTag: 5e185212-4595-5cdd-bf40-9f6f820c7faa
+
+	measure 'Avg Length of Stay' = AVERAGE ( Admissions[LengthOfStay] )
+		formatString: 0.0
+		displayFolder: 1 Volume
+		lineageTag: aa597221-35a1-58a7-81a0-fd97563e3e54
+
+	measure Beds = SUM ( Departments[Beds] )
+		formatString: #,0
+		displayFolder: 1 Volume
+		lineageTag: dd87f036-c727-5fa7-85a0-cff30cb41d9f
+
+	/// Patient days / (beds x days in the selected period)
+	measure 'Bed Occupancy %' = DIVIDE ( [Patient Days], [Beds] * COUNTROWS ( 'Date' ) )
+		formatString: 0.0%
+		displayFolder: 1 Volume
+		lineageTag: 6e971853-8728-5817-9551-2321e3036d73
+
+	measure 'Avg ER Wait (min)' = AVERAGE ( Admissions[ERWaitMinutes] )
+		formatString: 0
+		displayFolder: 2 Quality
+		lineageTag: 131e9d07-8362-5eaf-bcae-52734cd6980b
+
+	measure 'ER Waits > 90 min %' = DIVIDE ( COUNTROWS ( FILTER ( Admissions, Admissions[ERWaitMinutes] > 90 ) ), COUNTROWS ( FILTER ( Admissions, NOT ISBLANK ( Admissions[ERWaitMinutes] ) ) ) )
+		formatString: 0.0%
+		displayFolder: 2 Quality
+		lineageTag: 9b132f20-62c7-57d9-b745-aeb34550b3f9
+
+	measure Readmissions = SUM ( Admissions[Readmitted30] )
+		formatString: #,0
+		displayFolder: 2 Quality
+		lineageTag: 220e1ce3-16ec-5df8-9777-7a4cc5657703
+
+	measure 'Readmission Rate %' = DIVIDE ( [Readmissions], [Admissions] )
+		formatString: 0.0%
+		displayFolder: 2 Quality
+		lineageTag: 8a72d8e2-6dc0-5335-a9ab-54f98dd72f88
+
+	measure 'Avg Satisfaction' = AVERAGE ( Admissions[Satisfaction] )
+		formatString: 0.00
+		displayFolder: 2 Quality
+		lineageTag: 856432e0-14af-5213-bc93-898ad06fe2f0
+
+	measure 'Treatment Revenue' = SUM ( Admissions[TreatmentCost] )
+		formatString: \$#,0
+		displayFolder: 3 Finance
+		lineageTag: 7fe585dd-829d-5b90-9ee5-e4642694f222
+
+	measure 'Revenue per Patient Day' = DIVIDE ( [Treatment Revenue], [Patient Days] )
+		formatString: \$#,0
+		displayFolder: 3 Finance
+		lineageTag: a09bcfd1-4a83-5ef4-a010-977ecad1a9e7
+
+	measure 'Admissions YoY %' =
+			VAR yr = MAX ( 'Date'[Year] )
+			VAR cur = CALCULATE ( [Admissions], 'Date'[Year] = yr )
+			VAR prev = CALCULATE ( [Admissions], 'Date'[Year] = yr - 1 )
+			RETURN DIVIDE ( cur - prev, prev )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 4 Time intelligence
+		lineageTag: f421165c-114d-51c8-a81a-a96e9181b295
+
+	measure 'ER Wait YoY %' =
+			VAR yr = MAX ( 'Date'[Year] )
+			VAR cur = CALCULATE ( [Avg ER Wait (min)], 'Date'[Year] = yr )
+			VAR prev = CALCULATE ( [Avg ER Wait (min)], 'Date'[Year] = yr - 1 )
+			RETURN DIVIDE ( cur - prev, prev )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 4 Time intelligence
+		lineageTag: 879d2db1-824a-5e19-b3ca-2a5140ee6aa2
+
+	/// Safe bed occupancy level
+	measure 'Occupancy Target' = 0.85
+		formatString: 0%
+		displayFolder: 1 Volume
+		lineageTag: 894c405c-b956-5a83-86f8-35dc9d1ad1ca
+
+	measure 'Occupancy Max' = 1
+		formatString: 0%
+		displayFolder: 1 Volume
+		lineageTag: ff421e13-3446-5690-8536-1ad723c1e811
+
+	column Dummy
+		dataType: string
+		isHidden
+		lineageTag: 202e5d6e-c090-5ea9-acc2-c1e9e486a65e
+		summarizeBy: none
+		sourceColumn: Dummy
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Dummy = text], {})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table
+

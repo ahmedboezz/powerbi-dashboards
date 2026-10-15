@@ -1,0 +1,42 @@
+table 'Agent Logins'
+	lineageTag: 29ca6617-9a40-567e-b8ba-ec4e86b30e91
+
+	column Date
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 4fc3db32-9f78-5ba9-859b-fcfc2a7284f2
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column AgentID
+		dataType: string
+		lineageTag: 93a7d8ab-1877-5291-94cd-d0d9b7d56cbe
+		summarizeBy: none
+		sourceColumn: AgentID
+
+		annotation SummarizationSetBy = Automatic
+
+	column LoggedInSeconds
+		dataType: int64
+		formatString: #,0
+		lineageTag: 0bb10837-7830-56ed-b148-28fbab104ecd
+		summarizeBy: sum
+		sourceColumn: LoggedInSeconds
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Agent Logins' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "agent_logins.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Result = Table.TransformColumnTypes(Promoted, {{"Date", type date}, {"LoggedInSeconds", Int64.Type}}, "en-US")
+				in
+				    Result
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,122 @@
+table _Measures
+	lineageTag: b91f61c3-2ce2-5851-a164-812972f2a7d4
+
+	measure 'Calls Offered' = COUNTROWS ( Calls )
+		formatString: #,0
+		displayFolder: 1 Volume
+		lineageTag: e29a4857-584c-55e2-9486-a0dd17003255
+
+	measure 'Calls Answered' = CALCULATE ( COUNTROWS ( Calls ), Calls[Outcome] <> "Abandoned" )
+		formatString: #,0
+		displayFolder: 1 Volume
+		lineageTag: 9bccf538-c6ec-59dc-9a6f-35e313efb567
+
+	/// Abandoned within 5 seconds - excluded from service-level denominators (industry convention)
+	measure 'Short Abandons' = CALCULATE ( COUNTROWS ( Calls ), Calls[Outcome] = "Abandoned", Calls[WaitSeconds] <= 5 )
+		formatString: #,0
+		displayFolder: 1 Volume
+		lineageTag: fced4390-3229-5818-af23-85e2dfb73ba9
+
+	measure Abandoned = CALCULATE ( COUNTROWS ( Calls ), Calls[Outcome] = "Abandoned", Calls[WaitSeconds] > 5 )
+		formatString: #,0
+		displayFolder: 1 Volume
+		lineageTag: 15e4b851-600d-5ec4-be5e-dc3ba3876f10
+
+	measure 'Abandon %' = DIVIDE ( [Abandoned], [Calls Offered] - [Short Abandons] )
+		formatString: 0.0%
+		displayFolder: 2 Service
+		lineageTag: 434c1908-3294-5e37-8771-951f8553b2b7
+
+	measure 'Answered in SL' = CALCULATE ( COUNTROWS ( Calls ), Calls[Outcome] <> "Abandoned", Calls[WaitSeconds] <= 20 )
+		formatString: #,0
+		displayFolder: 2 Service
+		lineageTag: 71eab09a-f954-57f9-a6d5-7d4f9fb462dd
+
+	/// Answered within 20 seconds / (offered - short abandons). Target 80/20
+	measure 'Service Level %' = DIVIDE ( [Answered in SL], [Calls Offered] - [Short Abandons] )
+		formatString: 0.0%
+		displayFolder: 2 Service
+		lineageTag: 7c693184-d384-5e8b-bc00-e580a043a085
+
+	/// Average speed of answer
+	measure 'ASA (sec)' = CALCULATE ( AVERAGE ( Calls[WaitSeconds] ), Calls[Outcome] <> "Abandoned" )
+		formatString: 0
+		displayFolder: 2 Service
+		lineageTag: 44fc2058-b114-5fd0-88b4-7a9e8061ca50
+
+	/// Average handle time = talk + hold + after-call work
+	measure 'AHT (sec)' = DIVIDE ( CALCULATE ( SUM ( Calls[HandleSeconds] ), Calls[Outcome] <> "Abandoned" ), [Calls Answered] )
+		formatString: 0
+		displayFolder: 3 Efficiency
+		lineageTag: 5df21256-eb2c-58c2-87ff-88f634258afd
+
+	measure 'Handle Hours' = SUM ( Calls[HandleSeconds] ) / 3600
+		formatString: #,0
+		displayFolder: 3 Efficiency
+		lineageTag: 26bde023-0050-558e-b28f-1aa3828dbb56
+
+	measure 'Logged Hours' = SUM ( 'Agent Logins'[LoggedInSeconds] ) / 3600
+		formatString: #,0
+		displayFolder: 3 Efficiency
+		lineageTag: 38c9a06e-bc1d-5f95-bd87-8bde4282b4e3
+
+	measure 'Occupancy %' = DIVIDE ( [Handle Hours], [Logged Hours] )
+		formatString: 0.0%
+		displayFolder: 3 Efficiency
+		lineageTag: 332e2192-4a3b-5a70-bca1-9ae6ab6a1c30
+
+	/// Resolved on the call and no repeat contact within 7 days
+	measure 'FCR %' = DIVIDE ( CALCULATE ( COUNTROWS ( Calls ), Calls[FCR] = TRUE () ), [Calls Answered] )
+		formatString: 0.0%
+		displayFolder: 4 Quality
+		lineageTag: e018940c-d40f-50a8-930f-bd9af7d16793
+
+	measure 'Repeat Contact %' = DIVIDE ( CALCULATE ( COUNTROWS ( Calls ), Calls[RepeatWithin7d] = TRUE (), Calls[Outcome] <> "Abandoned" ), [Calls Answered] )
+		formatString: 0.0%
+		displayFolder: 4 Quality
+		lineageTag: b103d58d-e786-56d8-b901-f4b8e133e30b
+
+	measure 'CSAT Responses' = COUNT ( Calls[CSAT] )
+		formatString: #,0
+		displayFolder: 4 Quality
+		lineageTag: 9517dcba-d82b-5715-b763-fb4f370a1fdb
+
+	/// Share of 4-5 ratings
+	measure 'CSAT %' = DIVIDE ( CALCULATE ( COUNTROWS ( Calls ), Calls[CSAT] >= 4 ), [CSAT Responses] )
+		formatString: 0.0%
+		displayFolder: 4 Quality
+		lineageTag: 4eff2560-7566-5974-8379-040f586a200c
+
+	measure 'Avg CSAT' = AVERAGE ( Calls[CSAT] )
+		formatString: 0.00
+		displayFolder: 4 Quality
+		lineageTag: 37b7f100-bc3a-509d-ad0a-5a0c510f8040
+
+	/// Net Promoter Score = % promoters (9-10) - % detractors (0-6)
+	measure NPS =
+			VAR resp = COUNT ( Calls[NPS] )
+			VAR pro = CALCULATE ( COUNTROWS ( Calls ), Calls[NPS] >= 9 )
+			VAR det = CALCULATE ( COUNTROWS ( Calls ), Calls[NPS] <= 6, NOT ISBLANK ( Calls[NPS] ) )  -- blank would count as 0
+			RETURN DIVIDE ( pro - det, resp ) * 100
+		formatString: 0.0
+		displayFolder: 4 Quality
+		lineageTag: 7aeea971-fe9f-57dd-9fb1-701ac54a6293
+
+	column Dummy
+		dataType: string
+		isHidden
+		lineageTag: 202e5d6e-c090-5ea9-acc2-c1e9e486a65e
+		summarizeBy: none
+		sourceColumn: Dummy
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Dummy = text], {})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

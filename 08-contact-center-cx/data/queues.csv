@@ -1,0 +1,6 @@
+QueueName,QueueGroup,TargetServiceLevel,TargetSeconds
+Billing,Service,0.8,20
+Technical Support,Service,0.8,20
+Sales,Revenue,0.8,20
+Complaints,Service,0.8,20
+General Inquiry,Service,0.8,20

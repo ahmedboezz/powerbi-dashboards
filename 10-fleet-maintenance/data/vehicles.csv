@@ -1,0 +1,121 @@
+VehicleID,VehicleType,Make,ModelYear,Branch,FuelType,PurchaseCost
+VH-001,Light Van,Hyundai,2023,Madinah,Gasoline 91,101000.0
+VH-002,Light Van,Toyota,2015,Jeddah,Gasoline 91,94000.0
+VH-003,Pickup,Isuzu,2016,Riyadh,Gasoline 91,87000.0
+VH-004,Heavy Truck,Mercedes-Benz,2016,Riyadh,Diesel,453000.0
+VH-005,Light Van,Hyundai,2023,Qassim,Gasoline 91,90000.0
+VH-006,Medium Truck,Isuzu,2017,Jeddah,Diesel,261000.0
+VH-007,Light Van,Toyota,2017,Riyadh,Gasoline 91,102000.0
+VH-008,Light Van,Toyota,2022,Riyadh,Gasoline 91,93000.0
+VH-009,Medium Truck,Hino,2018,Dammam,Diesel,250000.0
+VH-010,Pickup,Toyota,2024,Jeddah,Gasoline 91,85000.0
+VH-011,Heavy Truck,Volvo,2020,Jeddah,Diesel,443000.0
+VH-012,Pickup,Isuzu,2016,Riyadh,Gasoline 91,85000.0
+VH-013,Heavy Truck,Mercedes-Benz,2022,Riyadh,Diesel,500000.0
+VH-014,Heavy Truck,Volvo,2019,Jeddah,Diesel,478000.0
+VH-015,Medium Truck,Isuzu,2023,Riyadh,Diesel,275000.0
+VH-016,Light Van,Hyundai,2021,Riyadh,Gasoline 91,89000.0
+VH-017,Medium Truck,Hino,2024,Qassim,Diesel,272000.0
+VH-018,Heavy Truck,Volvo,2024,Riyadh,Diesel,511000.0
+VH-019,Pickup,Isuzu,2018,Qassim,Gasoline 91,89000.0
+VH-020,Light Van,Hyundai,2024,Riyadh,Gasoline 91,100000.0
+VH-021,Light Van,Toyota,2023,Jeddah,Gasoline 91,101000.0
+VH-022,Medium Truck,Isuzu,2020,Qassim,Diesel,236000.0
+VH-023,Light Van,Toyota,2021,Dammam,Gasoline 91,94000.0
+VH-024,Pickup,Isuzu,2016,Jeddah,Gasoline 91,86000.0
+VH-025,Light Van,Toyota,2024,Riyadh,Gasoline 91,93000.0
+VH-026,Light Van,Toyota,2017,Riyadh,Gasoline 91,94000.0
+VH-027,Heavy Truck,Mercedes-Benz,2018,Dammam,Diesel,522000.0
+VH-028,Light Van,Toyota,2022,Qassim,Gasoline 91,86000.0
+VH-029,Medium Truck,Hino,2016,Riyadh,Diesel,286000.0
+VH-030,Medium Truck,Isuzu,2020,Riyadh,Diesel,280000.0
+VH-031,Light Van,Hyundai,2023,Qassim,Gasoline 91,89000.0
+VH-032,Light Van,Hyundai,2015,Riyadh,Gasoline 91,94000.0
+VH-033,Medium Truck,Hino,2016,Riyadh,Diesel,277000.0
+VH-034,Pickup,Isuzu,2025,Qassim,Gasoline 91,82000.0
+VH-035,Light Van,Hyundai,2024,Jeddah,Gasoline 91,96000.0
+VH-036,Light Van,Hyundai,2022,Jeddah,Gasoline 91,93000.0
+VH-037,Heavy Truck,Volvo,2015,Jeddah,Diesel,520000.0
+VH-038,Pickup,Isuzu,2023,Riyadh,Gasoline 91,83000.0
+VH-039,Pickup,Isuzu,2024,Dammam,Gasoline 91,84000.0
+VH-040,Light Van,Toyota,2019,Riyadh,Gasoline 91,94000.0
+VH-041,Heavy Truck,Volvo,2020,Qassim,Diesel,483000.0
+VH-042,Light Van,Hyundai,2020,Madinah,Gasoline 91,103000.0
+VH-043,Medium Truck,Isuzu,2017,Qassim,Diesel,265000.0
+VH-044,Heavy Truck,Mercedes-Benz,2018,Riyadh,Diesel,434000.0
+VH-045,Light Van,Toyota,2017,Dammam,Gasoline 91,96000.0
+VH-046,Heavy Truck,Mercedes-Benz,2017,Qassim,Diesel,437000.0
+VH-047,Medium Truck,Isuzu,2015,Riyadh,Diesel,246000.0
+VH-048,Pickup,Isuzu,2025,Dammam,Gasoline 91,92000.0
+VH-049,Medium Truck,Isuzu,2025,Riyadh,Diesel,235000.0
+VH-050,Light Van,Toyota,2024,Dammam,Gasoline 91,104000.0
+VH-051,Medium Truck,Hino,2021,Riyadh,Diesel,241000.0
+VH-052,Pickup,Isuzu,2021,Riyadh,Gasoline 91,81000.0
+VH-053,Light Van,Toyota,2021,Jeddah,Gasoline 91,92000.0
+VH-054,Medium Truck,Isuzu,2018,Jeddah,Diesel,277000.0
+VH-055,Light Van,Hyundai,2018,Dammam,Gasoline 91,103000.0
+VH-056,Medium Truck,Hino,2018,Jeddah,Diesel,274000.0
+VH-057,Medium Truck,Isuzu,2023,Qassim,Diesel,248000.0
+VH-058,Light Van,Hyundai,2016,Riyadh,Gasoline 91,102000.0
+VH-059,Light Van,Hyundai,2017,Riyadh,Gasoline 91,94000.0
+VH-060,Light Van,Toyota,2022,Dammam,Gasoline 91,87000.0
+VH-061,Pickup,Toyota,2021,Riyadh,Gasoline 91,85000.0
+VH-062,Medium Truck,Hino,2015,Jeddah,Diesel,236000.0
+VH-063,Pickup,Toyota,2023,Riyadh,Gasoline 91,84000.0
+VH-064,Medium Truck,Hino,2021,Riyadh,Diesel,262000.0
+VH-065,Heavy Truck,Mercedes-Benz,2022,Jeddah,Diesel,449000.0
+VH-066,Light Van,Toyota,2023,Qassim,Gasoline 91,87000.0
+VH-067,Medium Truck,Hino,2020,Riyadh,Diesel,281000.0
+VH-068,Pickup,Toyota,2015,Jeddah,Gasoline 91,88000.0
+VH-069,Pickup,Isuzu,2018,Riyadh,Gasoline 91,84000.0
+VH-070,Pickup,Toyota,2021,Riyadh,Gasoline 91,89000.0
+VH-071,Light Van,Toyota,2015,Qassim,Gasoline 91,92000.0
+VH-072,Light Van,Toyota,2021,Qassim,Gasoline 91,100000.0
+VH-073,Light Van,Toyota,2016,Riyadh,Gasoline 91,97000.0
+VH-074,Pickup,Isuzu,2015,Madinah,Gasoline 91,82000.0
+VH-075,Light Van,Toyota,2020,Dammam,Gasoline 91,100000.0
+VH-076,Light Van,Hyundai,2022,Jeddah,Gasoline 91,93000.0
+VH-077,Light Van,Hyundai,2017,Madinah,Gasoline 91,98000.0
+VH-078,Medium Truck,Isuzu,2017,Dammam,Diesel,265000.0
+VH-079,Medium Truck,Hino,2017,Jeddah,Diesel,261000.0
+VH-080,Medium Truck,Hino,2019,Jeddah,Diesel,275000.0
+VH-081,Medium Truck,Isuzu,2022,Madinah,Diesel,241000.0
+VH-082,Light Van,Hyundai,2017,Jeddah,Gasoline 91,86000.0
+VH-083,Medium Truck,Isuzu,2015,Riyadh,Diesel,237000.0
+VH-084,Pickup,Toyota,2016,Jeddah,Gasoline 91,84000.0
+VH-085,Heavy Truck,Volvo,2017,Riyadh,Diesel,447000.0
+VH-086,Light Van,Toyota,2023,Jeddah,Gasoline 91,99000.0
+VH-087,Light Van,Hyundai,2023,Qassim,Gasoline 91,92000.0
+VH-088,Medium Truck,Isuzu,2022,Riyadh,Diesel,257000.0
+VH-089,Pickup,Toyota,2018,Riyadh,Gasoline 91,79000.0
+VH-090,Pickup,Toyota,2023,Dammam,Gasoline 91,84000.0
+VH-091,Medium Truck,Isuzu,2023,Riyadh,Diesel,279000.0
+VH-092,Light Van,Hyundai,2019,Riyadh,Gasoline 91,97000.0
+VH-093,Pickup,Isuzu,2021,Dammam,Gasoline 91,77000.0
+VH-094,Medium Truck,Isuzu,2018,Jeddah,Diesel,265000.0
+VH-095,Pickup,Isuzu,2025,Riyadh,Gasoline 91,90000.0
+VH-096,Heavy Truck,Volvo,2022,Riyadh,Diesel,489000.0
+VH-097,Medium Truck,Hino,2025,Qassim,Diesel,253000.0
+VH-098,Light Van,Toyota,2018,Jeddah,Gasoline 91,99000.0
+VH-099,Medium Truck,Hino,2017,Riyadh,Diesel,285000.0
+VH-100,Pickup,Isuzu,2022,Riyadh,Gasoline 91,84000.0
+VH-101,Light Van,Hyundai,2020,Dammam,Gasoline 91,87000.0
+VH-102,Light Van,Toyota,2016,Dammam,Gasoline 91,101000.0
+VH-103,Medium Truck,Hino,2019,Dammam,Diesel,268000.0
+VH-104,Medium Truck,Hino,2018,Dammam,Diesel,268000.0
+VH-105,Light Van,Toyota,2022,Jeddah,Gasoline 91,91000.0
+VH-106,Medium Truck,Isuzu,2024,Jeddah,Diesel,261000.0
+VH-107,Light Van,Toyota,2015,Riyadh,Gasoline 91,97000.0
+VH-108,Light Van,Hyundai,2017,Riyadh,Gasoline 91,103000.0
+VH-109,Light Van,Hyundai,2020,Madinah,Gasoline 91,91000.0
+VH-110,Light Van,Hyundai,2017,Riyadh,Gasoline 91,88000.0
+VH-111,Pickup,Isuzu,2018,Dammam,Gasoline 91,78000.0
+VH-112,Light Van,Hyundai,2019,Riyadh,Gasoline 91,86000.0
+VH-113,Pickup,Isuzu,2016,Jeddah,Gasoline 91,80000.0
+VH-114,Medium Truck,Hino,2019,Madinah,Diesel,256000.0
+VH-115,Pickup,Isuzu,2018,Madinah,Gasoline 91,81000.0
+VH-116,Pickup,Toyota,2016,Riyadh,Gasoline 91,90000.0
+VH-117,Medium Truck,Hino,2022,Riyadh,Diesel,244000.0
+VH-118,Medium Truck,Hino,2020,Madinah,Diesel,252000.0
+VH-119,Light Van,Hyundai,2020,Dammam,Gasoline 91,102000.0
+VH-120,Pickup,Isuzu,2017,Qassim,Gasoline 91,90000.0

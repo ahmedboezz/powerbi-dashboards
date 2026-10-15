@@ -1,0 +1,42 @@
+/// Simplified IFRS 9 staging with illustrative coverage rates
+table Stages
+	lineageTag: d0ec3d32-3926-5830-ba63-64606ed918b9
+
+	column Stage
+		dataType: string
+		lineageTag: 0c691b4c-e960-5719-aafa-cd11323659eb
+		summarizeBy: none
+		sourceColumn: Stage
+		sortByColumn: 'Stage Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Stage Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9388926c-4025-5220-b271-ac405614b628
+		summarizeBy: none
+		sourceColumn: Stage Order
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ECL Rate'
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 283aec91-007e-53cb-822d-42ad690fb61f
+		summarizeBy: none
+		sourceColumn: ECL Rate
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Stages = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Stage = text, #"Stage Order" = Int64.Type, #"ECL Rate" = number],
+				        {{"Stage 1", 1, 0.008}, {"Stage 2", 2, 0.09}, {"Stage 3", 3, 0.55}, {"Exited", 4, 0}})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

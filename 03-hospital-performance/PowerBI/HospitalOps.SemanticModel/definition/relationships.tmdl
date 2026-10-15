@@ -1,0 +1,8 @@
+relationship 45b73a93-3460-5404-859b-617efd71a56e
+	fromColumn: Admissions.Department
+	toColumn: Departments.Department
+
+relationship 5f1f5b2b-f519-5291-9429-083d64cd741e
+	fromColumn: Admissions.AdmissionDate
+	toColumn: Date.Date
+

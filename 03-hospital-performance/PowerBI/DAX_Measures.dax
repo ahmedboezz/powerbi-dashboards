@@ -1,0 +1,71 @@
+// Hospital Inpatient & ER Performance - DAX measures (table _Measures)
+
+// [1 Volume]
+Admissions =
+    COUNTROWS ( Admissions )
+
+// [1 Volume]
+Patient Days =
+    SUM ( Admissions[LengthOfStay] )
+
+// [1 Volume]
+Avg Length of Stay =
+    AVERAGE ( Admissions[LengthOfStay] )
+
+// [1 Volume]
+Beds =
+    SUM ( Departments[Beds] )
+
+// [1 Volume] Patient days / (beds x days in the selected period)
+Bed Occupancy % =
+    DIVIDE ( [Patient Days], [Beds] * COUNTROWS ( 'Date' ) )
+
+// [2 Quality]
+Avg ER Wait (min) =
+    AVERAGE ( Admissions[ERWaitMinutes] )
+
+// [2 Quality]
+ER Waits > 90 min % =
+    DIVIDE ( COUNTROWS ( FILTER ( Admissions, Admissions[ERWaitMinutes] > 90 ) ), COUNTROWS ( FILTER ( Admissions, NOT ISBLANK ( Admissions[ERWaitMinutes] ) ) ) )
+
+// [2 Quality]
+Readmissions =
+    SUM ( Admissions[Readmitted30] )
+
+// [2 Quality]
+Readmission Rate % =
+    DIVIDE ( [Readmissions], [Admissions] )
+
+// [2 Quality]
+Avg Satisfaction =
+    AVERAGE ( Admissions[Satisfaction] )
+
+// [3 Finance]
+Treatment Revenue =
+    SUM ( Admissions[TreatmentCost] )
+
+// [3 Finance]
+Revenue per Patient Day =
+    DIVIDE ( [Treatment Revenue], [Patient Days] )
+
+// [4 Time intelligence]
+Admissions YoY % =
+    VAR yr = MAX ( 'Date'[Year] )
+VAR cur = CALCULATE ( [Admissions], 'Date'[Year] = yr )
+VAR prev = CALCULATE ( [Admissions], 'Date'[Year] = yr - 1 )
+RETURN DIVIDE ( cur - prev, prev )
+
+// [4 Time intelligence]
+ER Wait YoY % =
+    VAR yr = MAX ( 'Date'[Year] )
+VAR cur = CALCULATE ( [Avg ER Wait (min)], 'Date'[Year] = yr )
+VAR prev = CALCULATE ( [Avg ER Wait (min)], 'Date'[Year] = yr - 1 )
+RETURN DIVIDE ( cur - prev, prev )
+
+// [1 Volume] Safe bed occupancy level
+Occupancy Target =
+    0.85
+
+// [1 Volume]
+Occupancy Max =
+    1

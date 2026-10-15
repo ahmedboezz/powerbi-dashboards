@@ -1,0 +1,232 @@
+/// One row per inbound contact (phone, WhatsApp, app chat)
+table Calls
+	lineageTag: 4b1ab213-e20d-57ff-ae59-85b0746ed35d
+
+	column CallID
+		dataType: string
+		lineageTag: 0537e8d6-b57e-5930-94b0-cb11b5d126ed
+		summarizeBy: none
+		sourceColumn: CallID
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomerID
+		dataType: string
+		lineageTag: feff4d0a-a48a-5f98-b24b-2e56d4f0e2f0
+		summarizeBy: none
+		sourceColumn: CustomerID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Queue
+		dataType: string
+		lineageTag: 495745ff-5a7d-5175-a086-f978406f93a2
+		summarizeBy: none
+		sourceColumn: Queue
+
+		annotation SummarizationSetBy = Automatic
+
+	column Channel
+		dataType: string
+		lineageTag: 1f1f8b7f-714f-55f6-9312-6960d2d26101
+		summarizeBy: none
+		sourceColumn: Channel
+
+		annotation SummarizationSetBy = Automatic
+
+	column AgentID
+		dataType: string
+		lineageTag: c643992f-011d-5141-b3d2-0ea286252d13
+		summarizeBy: none
+		sourceColumn: AgentID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Outcome
+		dataType: string
+		lineageTag: 2dc51d17-ab7d-5cef-a2a9-f9209bbfe6a2
+		summarizeBy: none
+		sourceColumn: Outcome
+
+		annotation SummarizationSetBy = Automatic
+
+	column CallDateTime
+		dataType: dateTime
+		formatString: dd/mm/yyyy hh:nn
+		lineageTag: f3a6767c-6703-5853-9046-0ba7e0300ca6
+		summarizeBy: none
+		sourceColumn: CallDateTime
+
+		annotation SummarizationSetBy = Automatic
+
+	column CallDate
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: e924b3c3-20ee-5aa4-a707-5b87fddce567
+		summarizeBy: none
+		sourceColumn: CallDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column WaitSeconds
+		dataType: int64
+		formatString: #,0
+		lineageTag: 3f67aa10-773a-518e-aff9-1588e0a5be33
+		summarizeBy: sum
+		sourceColumn: WaitSeconds
+
+		annotation SummarizationSetBy = Automatic
+
+	column TalkSeconds
+		dataType: int64
+		formatString: #,0
+		lineageTag: 009f0d4b-73ba-5955-b648-e4b95ed65a93
+		summarizeBy: sum
+		sourceColumn: TalkSeconds
+
+		annotation SummarizationSetBy = Automatic
+
+	column HoldSeconds
+		dataType: int64
+		formatString: #,0
+		lineageTag: f1c9c505-1399-521c-ad9c-09748c1dc758
+		summarizeBy: sum
+		sourceColumn: HoldSeconds
+
+		annotation SummarizationSetBy = Automatic
+
+	column ACWSeconds
+		dataType: int64
+		formatString: #,0
+		lineageTag: e7360ab5-9c01-5bc4-9390-0e7db4beb284
+		summarizeBy: sum
+		sourceColumn: ACWSeconds
+
+		annotation SummarizationSetBy = Automatic
+
+	column HandleSeconds
+		dataType: int64
+		formatString: #,0
+		lineageTag: 378db3d2-95b4-580c-a7f6-5ad0688155b9
+		summarizeBy: sum
+		sourceColumn: HandleSeconds
+
+		annotation SummarizationSetBy = Automatic
+
+	column CSAT
+		dataType: int64
+		formatString: 0
+		lineageTag: 8bffed79-bf6a-5e59-8463-7c42e6992277
+		summarizeBy: none
+		sourceColumn: CSAT
+
+		annotation SummarizationSetBy = Automatic
+
+	column NPS
+		dataType: int64
+		formatString: 0
+		lineageTag: 221ce311-16a2-5018-a7a8-c56ac241ce94
+		summarizeBy: none
+		sourceColumn: NPS
+
+		annotation SummarizationSetBy = Automatic
+
+	column Hour
+		dataType: int64
+		formatString: 0
+		lineageTag: 6594a0c3-6a86-5dd5-83d6-0c97ec85a481
+		summarizeBy: none
+		sourceColumn: Hour
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Wait Band'
+		dataType: string
+		lineageTag: 51a02822-22ec-5a22-a666-c9b14ce12834
+		summarizeBy: none
+		sourceColumn: Wait Band
+		sortByColumn: 'Wait Band Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Wait Band Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 0066479f-0e25-55a8-b82e-19482be77feb
+		summarizeBy: none
+		sourceColumn: Wait Band Order
+
+		annotation SummarizationSetBy = Automatic
+
+	column RepeatWithin7d
+		dataType: boolean
+		lineageTag: bf39af80-3e45-506f-a4f9-c5a9a100913c
+		summarizeBy: none
+		sourceColumn: RepeatWithin7d
+
+		annotation SummarizationSetBy = Automatic
+
+	column FCR
+		dataType: boolean
+		lineageTag: 5b25a73d-e0e6-5cf1-ad27-95e09bd961cd
+		summarizeBy: none
+		sourceColumn: FCR
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Agent Tenure Band'
+		dataType: string
+		lineageTag: 4efb2ed8-3df0-50f7-ad48-8bcb2a206365
+		summarizeBy: none
+		sourceColumn: Agent Tenure Band
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Calls = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "calls_2025.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    // telephony export: duplicated rows
+				    Dedup = Table.Distinct(Promoted, {"CallID"}),
+				    QueueMap = [billing = "Billing", #"billing & payments" = "Billing", #"tech support" = "Technical Support", technical = "Technical Support",
+				                #"technical support" = "Technical Support", sales = "Sales", complaint = "Complaints", complaints = "Complaints",
+				                general = "General Inquiry", #"general inquiry" = "General Inquiry"],
+				    Queue = Table.TransformColumns(Dedup, {{"Queue", each Record.FieldOrDefault(QueueMap, Text.Lower(Text.Trim(_)), _), type text},
+				                                           {"AgentID", each Text.Upper(Text.Trim(_)), type text}}),
+				    // talk time sometimes exported as mm:ss
+				    Talk = Table.TransformColumns(Queue, {{"TalkSeconds", each if Text.Contains(_, ":")
+				              then Number.From(Text.BeforeDelimiter(_, ":")) * 60 + Number.From(Text.AfterDelimiter(_, ":"))
+				              else Number.From(_), Int64.Type}}),
+				    Typed = Table.TransformColumnTypes(Talk, {{"CallDateTime", type datetime}, {"WaitSeconds", Int64.Type}, {"HoldSeconds", Int64.Type},
+				              {"ACWSeconds", Int64.Type}, {"CSAT", Int64.Type}, {"NPS", Int64.Type}}, "en-US"),
+				    CallDate = Table.AddColumn(Typed, "CallDate", each DateTime.Date([CallDateTime]), type date),
+				    Hour = Table.AddColumn(CallDate, "Hour", each Time.Hour(DateTime.Time([CallDateTime])), Int64.Type),
+				    Handle = Table.AddColumn(Hour, "HandleSeconds", each [TalkSeconds] + [HoldSeconds] + [ACWSeconds], Int64.Type),
+				    WaitBand = Table.AddColumn(Handle, "Wait Band", each if [WaitSeconds] <= 20 then "0-20s" else if [WaitSeconds] <= 60 then "21-60s"
+				                 else if [WaitSeconds] <= 120 then "61-120s" else if [WaitSeconds] <= 300 then "121-300s" else ">300s", type text),
+				    WaitOrd = Table.AddColumn(WaitBand, "Wait Band Order", each List.PositionOf({"0-20s", "21-60s", "61-120s", "121-300s", ">300s"}, [Wait Band]), Int64.Type),
+				    // next contact of the same customer -> repeat within 7 days (index self-merge)
+				    Sorted = Table.Buffer(Table.Sort(WaitOrd, {{"CustomerID", Order.Ascending}, {"CallDateTime", Order.Ascending}})),
+				    Idx = Table.AddIndexColumn(Sorted, "Idx", 0, 1, Int64.Type),
+				    Nxt = Table.AddColumn(Table.SelectColumns(Idx, {"CustomerID", "CallDateTime", "Idx"}), "PrevIdx", each [Idx] - 1, Int64.Type),
+				    NxtRen = Table.RenameColumns(Table.RemoveColumns(Nxt, {"Idx"}), {{"CallDateTime", "NextCallDateTime"}, {"CustomerID", "NextCustomerID"}}),
+				    Joined = Table.Join(Idx, {"Idx"}, NxtRen, {"PrevIdx"}, JoinKind.LeftOuter),
+				    Repeat = Table.AddColumn(Joined, "RepeatWithin7d", each [NextCustomerID] = [CustomerID] and [NextCallDateTime] - [CallDateTime] <= #duration(7, 0, 0, 0), type logical),
+				    FCR = Table.AddColumn(Repeat, "FCR", each [Outcome] = "Resolved" and not [RepeatWithin7d], type logical),
+				    // agent tenure at the time of the call
+				    Agents = Table.Buffer(Table.TransformColumnTypes(Table.PromoteHeaders(Csv.Document(File.Contents(DataFolder & "agents.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]), [PromoteAllScalars = true]), {{"HireDate", type date}}, "en-US")),
+				    WithHire = Table.NestedJoin(FCR, {"AgentID"}, Agents, {"AgentID"}, "A", JoinKind.LeftOuter),
+				    Hire = Table.ExpandTableColumn(WithHire, "A", {"HireDate"}),
+				    Tenure = Table.AddColumn(Hire, "Agent Tenure Band", each if [HireDate] = null then null
+				               else let mth = Duration.Days([CallDate] - [HireDate]) / 30.4 in
+				                    if mth < 6 then "0-6 months" else if mth < 24 then "6-24 months" else "2+ years", type text),
+				    Result = Table.RemoveColumns(Tenure, {"Idx", "PrevIdx", "NextCallDateTime", "NextCustomerID", "HireDate"})
+				in
+				    Result
+
+	annotation PBI_ResultType = Table

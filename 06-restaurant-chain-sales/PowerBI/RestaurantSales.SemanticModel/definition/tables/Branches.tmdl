@@ -1,0 +1,47 @@
+table Branches
+	lineageTag: 070eac07-2fa5-523d-9c31-fa1b6d90a6cf
+
+	column Branch
+		dataType: string
+		lineageTag: 7be133bf-b0b0-5e14-a8db-e127c8caf20d
+		summarizeBy: none
+		sourceColumn: Branch
+
+		annotation SummarizationSetBy = Automatic
+
+	column Zone
+		dataType: string
+		lineageTag: 7b76895d-1d18-5354-85f1-1e463c37dc34
+		summarizeBy: none
+		sourceColumn: Zone
+
+		annotation SummarizationSetBy = Automatic
+
+	column Seats
+		dataType: int64
+		lineageTag: 00e25011-b9d6-5cbc-9ce5-ec38f0c36dcd
+		summarizeBy: sum
+		sourceColumn: Seats
+
+		annotation SummarizationSetBy = Automatic
+
+	column Opened
+		dataType: int64
+		lineageTag: a1988a39-dda2-526c-9f5e-64d3008ca962
+		summarizeBy: sum
+		sourceColumn: Opened
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Branches = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "branches.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"Branch", type text}, {"Zone", type text}, {"Seats", Int64.Type}, {"Opened", Int64.Type}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

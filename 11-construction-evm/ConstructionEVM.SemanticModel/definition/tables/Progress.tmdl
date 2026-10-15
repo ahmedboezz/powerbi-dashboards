@@ -1,0 +1,64 @@
+/// Monthly (non-cumulative) planned value, earned value and actual cost per project
+table Progress
+	lineageTag: 099c869f-f76f-558b-a444-cf7b0333c1c7
+
+	column ProjectID
+		dataType: string
+		lineageTag: 2e619aba-d327-5440-82d6-ff3811241208
+		summarizeBy: none
+		sourceColumn: ProjectID
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthEnd
+		dataType: dateTime
+		formatString: mmm yyyy
+		lineageTag: c464d969-441d-5efd-a9f2-f4b67c3b3620
+		summarizeBy: none
+		sourceColumn: MonthEnd
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column PlannedValue
+		dataType: double
+		formatString: #,0
+		lineageTag: c7369186-4753-5a0a-b556-1054745287bc
+		summarizeBy: sum
+		sourceColumn: PlannedValue
+
+		annotation SummarizationSetBy = Automatic
+
+	column EarnedValue
+		dataType: double
+		formatString: #,0
+		lineageTag: a1c922ab-6016-5158-a6cb-289131186ab0
+		summarizeBy: sum
+		sourceColumn: EarnedValue
+
+		annotation SummarizationSetBy = Automatic
+
+	column ActualCost
+		dataType: double
+		formatString: #,0
+		lineageTag: 859b4b5a-a198-5462-b231-f936371dec05
+		summarizeBy: sum
+		sourceColumn: ActualCost
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Progress = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "monthly_progress.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    // ERP period 'MM/yyyy' -> month-end date
+				    Month = Table.TransformColumns(Promoted, {{"MonthEnd", each Date.EndOfMonth(#date(Number.From(Text.AfterDelimiter(_, "/")),
+				              Number.From(Text.BeforeDelimiter(_, "/")), 1)), type date}}),
+				    Typed = Table.TransformColumnTypes(Month, {{"PlannedValue", type number}, {"EarnedValue", type number}, {"ActualCost", type number}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,180 @@
+/// One row per financing contract
+table Loans
+	lineageTag: 77d98d0e-640e-522d-a7b2-8c5c0219c074
+
+	column LoanID
+		dataType: string
+		lineageTag: bbb2fedf-e440-5f84-89de-34d76126f8b4
+		summarizeBy: none
+		sourceColumn: LoanID
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomerID
+		dataType: string
+		lineageTag: 484d3862-eb57-59d6-a3e5-6762690a332f
+		summarizeBy: none
+		sourceColumn: CustomerID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductCode
+		dataType: string
+		lineageTag: cd9aaa65-43d4-53bc-8650-9977c5f2544d
+		summarizeBy: none
+		sourceColumn: ProductCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column BranchCode
+		dataType: string
+		lineageTag: 1946e96f-a0eb-537c-8f5b-fee773d1bbd5
+		summarizeBy: none
+		sourceColumn: BranchCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column Channel
+		dataType: string
+		lineageTag: c1d188d2-5e64-579b-81ea-80268a2b115b
+		summarizeBy: none
+		sourceColumn: Channel
+
+		annotation SummarizationSetBy = Automatic
+
+	column DisbursementDate
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: e164736c-453c-587f-ac03-18fab40c6c94
+		summarizeBy: none
+		sourceColumn: DisbursementDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Principal
+		dataType: double
+		formatString: #,0
+		lineageTag: 5f9ed5c9-53b6-5418-a6e6-6662aed5797a
+		summarizeBy: sum
+		sourceColumn: Principal
+
+		annotation SummarizationSetBy = Automatic
+
+	column TenorMonths
+		dataType: int64
+		formatString: 0
+		lineageTag: 081dbb18-5bdc-5451-8f3a-cea1ac6a91a8
+		summarizeBy: none
+		sourceColumn: TenorMonths
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProfitRate
+		dataType: double
+		formatString: 0.00%
+		lineageTag: 40158962-0440-55f6-a818-10a5d9717ed2
+		summarizeBy: none
+		sourceColumn: ProfitRate
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthlyInstallment
+		dataType: double
+		formatString: #,0
+		lineageTag: d439c090-9590-55b4-a537-e503c1c2f62e
+		summarizeBy: sum
+		sourceColumn: MonthlyInstallment
+
+		annotation SummarizationSetBy = Automatic
+
+	column DBR
+		dataType: double
+		formatString: 0.0%
+		lineageTag: c18ed1d0-0a57-50ad-8a86-fbb0eeb175ef
+		summarizeBy: none
+		sourceColumn: DBR
+
+		annotation SummarizationSetBy = Automatic
+
+	column CreditScore
+		dataType: int64
+		formatString: 0
+		lineageTag: dee67c76-40cd-5872-873f-8909fdfed134
+		summarizeBy: none
+		sourceColumn: CreditScore
+
+		annotation SummarizationSetBy = Automatic
+
+	column Vintage
+		dataType: string
+		lineageTag: 9c944246-da6f-58ba-81e9-af3fb2a07134
+		summarizeBy: none
+		sourceColumn: Vintage
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Score Band'
+		dataType: string
+		lineageTag: a3252d79-4e2a-5b72-9ceb-1a7efd2ec845
+		summarizeBy: none
+		sourceColumn: Score Band
+		sortByColumn: 'Score Band Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Score Band Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 56e2a5d0-5062-54a7-b5d9-c141819539dc
+		summarizeBy: none
+		sourceColumn: Score Band Order
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'DBR Band'
+		dataType: string
+		lineageTag: dd4ecf68-5a65-56ea-9a8e-4a404b953d5c
+		summarizeBy: none
+		sourceColumn: DBR Band
+		sortByColumn: 'DBR Band Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'DBR Band Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 8eee46f2-dd9d-5eb3-a2fe-b6ccf8dc5230
+		summarizeBy: none
+		sourceColumn: DBR Band Order
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Loans = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "loans.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Product = Table.TransformColumns(Promoted, {{"ProductCode", each Text.Upper(Text.Trim(_)), type text}}),
+				    ChannelMap = [#"mobile app" = "Mobile App", app = "Mobile App", branch = "Branch", broker = "Broker", dealer = "Car Dealer",
+				                  #"car dealer" = "Car Dealer", merchant = "Merchant Partner", #"merchant partner" = "Merchant Partner"],
+				    Channel = Table.TransformColumns(Product, {{"Channel", each Record.FieldOrDefault(ChannelMap, Text.Lower(Text.Trim(_)), Text.Trim(_)), type text}}),
+				    Rate = Table.TransformColumns(Channel, {{"ProfitRate", each Number.From(Text.Remove(_, "%"), "en-US") / 100, type number}}),
+				    Dates = Table.TransformColumns(Rate, {{"DisbursementDate", each Date.FromText(_, [Format = "dd/MM/yyyy"]), type date}}),
+				    Typed = Table.TransformColumnTypes(Dates, {{"Principal", type number}, {"TenorMonths", Int64.Type}, {"MonthlyInstallment", type number},
+				                                                {"DBR", type number}, {"CreditScore", Int64.Type}}, "en-US"),
+				    Vintage = Table.AddColumn(Typed, "Vintage", each Text.From(Date.Year([DisbursementDate])) & " H" &
+				                (if Date.Month([DisbursementDate]) <= 6 then "1" else "2"), type text),
+				    Score = Table.AddColumn(Vintage, "Score Band", each if [CreditScore] < 600 then "<600" else if [CreditScore] < 680 then "600-679"
+				                else if [CreditScore] < 750 then "680-749" else "750+", type text),
+				    ScoreOrd = Table.AddColumn(Score, "Score Band Order", each List.PositionOf({"<600", "600-679", "680-749", "750+"}, [Score Band]), Int64.Type),
+				    Dbr = Table.AddColumn(ScoreOrd, "DBR Band", each if [DBR] <= 0.33 then "<=33%" else if [DBR] <= 0.45 then "33-45%" else ">45%", type text),
+				    DbrOrd = Table.AddColumn(Dbr, "DBR Band Order", each List.PositionOf({"<=33%", "33-45%", ">45%"}, [DBR Band]), Int64.Type)
+				in
+				    DbrOrd
+
+	annotation PBI_ResultType = Table

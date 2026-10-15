@@ -1,0 +1,8 @@
+relationship 388c60f0-9858-5fbf-982c-bfe75f9785c7
+	fromColumn: Sales.Branch
+	toColumn: Branches.Branch
+
+relationship 5ead63c7-d578-5765-9a2a-c776b70d5582
+	fromColumn: Sales.OrderDate
+	toColumn: Date.Date
+

@@ -1,0 +1,33 @@
+/// Delinquency bucket of the current month
+table Bucket
+	lineageTag: 3b48c6c1-ca5a-5ee8-a9e3-8b88e9b67571
+
+	column Bucket
+		dataType: string
+		lineageTag: 317241a1-afdc-5c11-ad83-48d92900f9df
+		summarizeBy: none
+		sourceColumn: Bucket
+		sortByColumn: 'Bucket Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Bucket Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 588d4413-75ab-5680-a4ae-c6e249ac77e4
+		summarizeBy: none
+		sourceColumn: Bucket Order
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Bucket = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Bucket = text, #"Bucket Order" = Int64.Type],
+				        {{"Current", 1}, {"1-29", 2}, {"30-59", 3}, {"60-89", 4}, {"90+", 5}, {"Written-off", 6}, {"Closed", 7}})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

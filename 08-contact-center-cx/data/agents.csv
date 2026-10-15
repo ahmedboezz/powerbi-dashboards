@@ -1,0 +1,13 @@
+AgentID,AgentName,Team,Supervisor,HireDate,Language,Gender
+AG101,Agent 101,Riyadh Team,SUP-1,2023-07-17,Arabic,Male
+AG102,Agent 102,Jeddah Team,SUP-2,2021-02-26,Arabic + English,Male
+AG103,Agent 103,Riyadh Team,SUP-1,2019-11-13,Arabic + English,Female
+AG104,Agent 104,Jeddah Team,SUP-2,2024-10-24,Arabic,Female
+AG105,Agent 105,Riyadh Team,SUP-1,2019-12-21,Arabic,Male
+AG106,Agent 106,Jeddah Team,SUP-2,2022-07-30,Arabic,Male
+AG107,Agent 107,Riyadh Team,SUP-1,2021-10-04,Arabic,Male
+AG108,Agent 108,Jeddah Team,SUP-2,2023-09-10,Arabic,Female
+AG109,Agent 109,Riyadh Team,SUP-1,2025-03-23,Arabic,Male
+AG110,Agent 110,Jeddah Team,SUP-2,2025-05-11,Arabic,Female
+AG111,Agent 111,Riyadh Team,SUP-1,2025-10-15,Arabic + English,Female
+AG112,Agent 112,Jeddah Team,SUP-2,2025-05-18,Arabic + English,Female

@@ -1,0 +1,15 @@
+relationship 22965473-47e9-5c8b-bfb0-858633f698c6
+	fromColumn: Progress.ProjectID
+	toColumn: Projects.ProjectID
+
+relationship cf9ae950-a46c-5c24-b3af-4e0cb8f6d040
+	fromColumn: Progress.MonthEnd
+	toColumn: Date.Date
+
+relationship 0cdd1a02-1b1c-5f63-9aa9-165927747989
+	fromColumn: 'Change Orders'.ProjectID
+	toColumn: Projects.ProjectID
+
+relationship a90d26cb-6477-5b14-8f42-d70a95d76102
+	fromColumn: Risks.ProjectID
+	toColumn: Projects.ProjectID

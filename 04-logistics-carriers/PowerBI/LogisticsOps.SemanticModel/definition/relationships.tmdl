@@ -1,0 +1,8 @@
+relationship c875d14c-0eee-5e04-a65a-328a5ababfe2
+	fromColumn: Shipments.Carrier
+	toColumn: Carriers.Carrier
+
+relationship 5e821671-ffe3-5ac6-9826-09508ee5047c
+	fromColumn: Shipments.ShipDate
+	toColumn: Date.Date
+

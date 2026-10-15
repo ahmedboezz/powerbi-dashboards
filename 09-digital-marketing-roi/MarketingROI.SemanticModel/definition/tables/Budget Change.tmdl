@@ -1,0 +1,23 @@
+/// What-if parameter: change in spend
+table 'Budget Change'
+	lineageTag: bcc331f8-a063-5921-86bc-3736c982c072
+
+	column 'Budget Change %'
+		dataType: double
+		formatString: +0%;-0%;0%
+		lineageTag: f0030b4c-9395-5609-8d36-90edec2ddc63
+		summarizeBy: none
+		sourceColumn: Budget Change %
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Budget Change' = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromList({-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50}, Splitter.SplitByNothing(), {"Budget Change %"}),
+				    Typed = Table.TransformColumns(Source, {{"Budget Change %", each _ / 100, type number}})
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

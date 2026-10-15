@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "HospitalOps"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "4ee38019-43ec-4a96-91a7-49cfb716f59d"
+  }
+}

@@ -1,0 +1,39 @@
+CampaignID,CampaignName,Channel,Objective,StartDate,EndDate
+CMP001,Google | Always-on Prospecting,Google Search,Acquisition,2025-01-01,2025-12-31
+CMP002,Google | Retargeting,Google Search,Retargeting,2025-01-01,2025-12-31
+CMP003,Google | Ramadan & Eid,google search,Seasonal,2025-02-20,2025-04-05
+CMP004,Google | National Day,Google Search,Seasonal,2025-09-15,2025-09-26
+CMP005,Google | White Friday,google search,Seasonal,2025-11-15,2025-12-02
+CMP006,Google | Always-on Prospecting,Google Display,Acquisition,2025-01-01,2025-12-31
+CMP007,Google | Retargeting,Google Display,Retargeting,2025-01-01,2025-12-31
+CMP008,Google | Ramadan & Eid,Google Display,Seasonal,2025-02-20,2025-04-05
+CMP009,Google | National Day,Google Display,Seasonal,2025-09-15,2025-09-26
+CMP010,Google | White Friday,Google Display,Seasonal,2025-11-15,2025-12-02
+CMP011,Meta | Always-on Prospecting,Meta Ads,Acquisition,2025-01-01,2025-12-31
+CMP012,Meta | Retargeting,Meta (Instagram/Facebook),Retargeting,2025-01-01,2025-12-31
+CMP013,Meta | Ramadan & Eid,Meta (Instagram/Facebook),Seasonal,2025-02-20,2025-04-05
+CMP014,Meta | National Day,Meta (Instagram/Facebook),Seasonal,2025-09-15,2025-09-26
+CMP015,Meta | White Friday,Meta (Instagram/Facebook),Seasonal,2025-11-15,2025-12-02
+CMP016,Snapchat | Always-on Prospecting,Snapchat,Acquisition,2025-01-01,2025-12-31
+CMP017,Snapchat | Retargeting,snapchat,Retargeting,2025-01-01,2025-12-31
+CMP018,Snapchat | Ramadan & Eid,Snapchat,Seasonal,2025-02-20,2025-04-05
+CMP019,Snapchat | National Day,Snapchat,Seasonal,2025-09-15,2025-09-26
+CMP020,Snapchat | White Friday,snapchat,Seasonal,2025-11-15,2025-12-02
+CMP021,TikTok | Always-on Prospecting,TikTok,Acquisition,2025-01-01,2025-12-31
+CMP022,TikTok | Retargeting,Tiktok,Retargeting,2025-01-01,2025-12-31
+CMP023,TikTok | Ramadan & Eid,Tiktok,Seasonal,2025-02-20,2025-04-05
+CMP024,TikTok | National Day,Tiktok,Seasonal,2025-09-15,2025-09-26
+CMP025,TikTok | White Friday,TikTok,Seasonal,2025-11-15,2025-12-02
+CMP026,X | Always-on Prospecting,X (Twitter),Acquisition,2025-01-01,2025-12-31
+CMP027,X | Retargeting,X (Twitter),Retargeting,2025-01-01,2025-12-31
+CMP028,X | Ramadan & Eid,X (Twitter),Seasonal,2025-02-20,2025-04-05
+CMP029,X | National Day,X (Twitter),Seasonal,2025-09-15,2025-09-26
+CMP030,X | White Friday,X (Twitter),Seasonal,2025-11-15,2025-12-02
+CMP031,Influencers | Ramadan Creators,Influencers,Seasonal,2025-02-25,2025-03-29
+CMP032,Influencers | Summer Creators,Influencers,Acquisition,2025-06-15,2025-07-15
+CMP033,Influencers | White Friday Creators,Influencers,Seasonal,2025-11-18,2025-11-30
+CMP034,CRM | Always-on Prospecting,Email & SMS,Acquisition,2025-01-01,2025-12-31
+CMP035,CRM | Retargeting,Email & SMS,Retargeting,2025-01-01,2025-12-31
+CMP036,CRM | Ramadan & Eid,Email & SMS,Seasonal,2025-02-20,2025-04-05
+CMP037,CRM | National Day,Email & SMS,Seasonal,2025-09-15,2025-09-26
+CMP038,CRM | White Friday,Email & SMS,Seasonal,2025-11-15,2025-12-02

@@ -1,0 +1,117 @@
+table Date
+	lineageTag: e61c1465-f24c-51ec-9b92-09b9cd53a3be
+
+	column Date
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: d17a2516-716b-5759-81ba-49bd285ee3c5
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Year
+		dataType: int64
+		formatString: 0
+		lineageTag: 8e0789e2-faa3-5d50-a4dc-2d12c01aed6d
+		summarizeBy: none
+		sourceColumn: Year
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		dataType: string
+		lineageTag: 8eff3eb6-e9d4-5d68-973b-2401d87ea2b7
+		summarizeBy: none
+		sourceColumn: Quarter
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Month No'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 39b23d24-14a7-558a-b76b-5fd4ad8fba94
+		summarizeBy: none
+		sourceColumn: Month No
+
+		annotation SummarizationSetBy = Automatic
+
+	column Month
+		dataType: string
+		lineageTag: 56cd6708-73d5-5c20-8692-6ec6f9af40fa
+		summarizeBy: none
+		sourceColumn: Month
+		sortByColumn: 'Month No'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Year Month'
+		dataType: string
+		lineageTag: 5eac3b0f-e11f-5484-8d03-a66287378b10
+		summarizeBy: none
+		sourceColumn: Year Month
+		sortByColumn: 'Year Month Key'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Year Month Key'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 7ee5d084-8533-5563-879d-de97031f16da
+		summarizeBy: none
+		sourceColumn: Year Month Key
+
+		annotation SummarizationSetBy = Automatic
+
+	column Weekday
+		dataType: string
+		lineageTag: 1eb18c6f-19f9-5f1a-a26e-785bcbd6d2b4
+		summarizeBy: none
+		sourceColumn: Weekday
+		sortByColumn: 'Weekday Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Weekday Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: afce1d59-aa49-55a0-aec1-300f687fee33
+		summarizeBy: none
+		sourceColumn: Weekday Order
+
+		annotation SummarizationSetBy = Automatic
+
+	column Period
+		dataType: string
+		lineageTag: 1e92d481-c5e2-59fa-b3fe-35a7c9ea9a6d
+		summarizeBy: none
+		sourceColumn: Period
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Date = m
+		mode: import
+		source =
+				let
+				    Dates = List.Dates(#date(2025, 1, 1), Duration.Days(#date(2025, 12, 31) - #date(2025, 1, 1)) + 1, #duration(1, 0, 0, 0)),
+				    T = Table.FromList(Dates, Splitter.SplitByNothing(), {"Date"}),
+				    Typed = Table.TransformColumnTypes(T, {{"Date", type date}}),
+				    Year = Table.AddColumn(Typed, "Year", each Date.Year([Date]), Int64.Type),
+				    Q = Table.AddColumn(Year, "Quarter", each "Q" & Text.From(Date.QuarterOfYear([Date])), type text),
+				    MonthNo = Table.AddColumn(Q, "Month No", each Date.Month([Date]), Int64.Type),
+				    Month = Table.AddColumn(MonthNo, "Month", each Date.ToText([Date], "MMM", "en-US"), type text),
+				    YM = Table.AddColumn(Month, "Year Month", each Date.ToText([Date], "MMM yyyy", "en-US"), type text),
+				    YMKey = Table.AddColumn(YM, "Year Month Key", each Date.Year([Date]) * 100 + Date.Month([Date]), Int64.Type),
+				    // Saudi working week starts on Sunday
+				    WD = Table.AddColumn(YMKey, "Weekday", each Date.ToText([Date], "ddd", "en-US"), type text),
+				    WDO = Table.AddColumn(WD, "Weekday Order", each Number.Mod(Date.DayOfWeek([Date], Day.Sunday), 7) + 1, Int64.Type),
+				    Period = Table.AddColumn(WDO, "Period", each if ([Date] >= #date(2025,3,1) and [Date] <= #date(2025,3,29)) then "Ramadan" else "Regular", type text)
+				in
+				    Period
+
+	annotation PBI_ResultType = Table

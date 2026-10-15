@@ -1,0 +1,77 @@
+table 'Change Orders'
+	lineageTag: 4e298189-152e-5d65-9bc7-6a478dc13f89
+
+	column ChangeOrderID
+		dataType: string
+		lineageTag: a9880515-6c74-5a4a-9226-b2698c9dc75f
+		summarizeBy: none
+		sourceColumn: ChangeOrderID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProjectID
+		dataType: string
+		lineageTag: d69d2379-1120-5f3d-87ab-56fb911415f5
+		summarizeBy: none
+		sourceColumn: ProjectID
+
+		annotation SummarizationSetBy = Automatic
+
+	column SubmittedDate
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: f3ecf818-7f2d-5e7b-9797-3fa4620f1acd
+		summarizeBy: none
+		sourceColumn: SubmittedDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Reason
+		dataType: string
+		lineageTag: e38d0997-9074-548d-9144-4de051f77435
+		summarizeBy: none
+		sourceColumn: Reason
+
+		annotation SummarizationSetBy = Automatic
+
+	column Amount
+		dataType: double
+		formatString: #,0
+		lineageTag: 91d54910-c8e9-5450-8c2c-c609d95a8a84
+		summarizeBy: sum
+		sourceColumn: Amount
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: bc0d287f-d163-5662-8f5d-9ea4076c941e
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column ScheduleImpactDays
+		dataType: int64
+		formatString: 0
+		lineageTag: abcafce2-8729-5f31-8211-c41c5f8de76d
+		summarizeBy: sum
+		sourceColumn: ScheduleImpactDays
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Change Orders' = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "change_orders.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+
+				    Typed = Table.TransformColumnTypes(Promoted, {{"SubmittedDate", type date}, {"Amount", type number}, {"ScheduleImpactDays", Int64.Type}}, "en-US"),
+				    Result = Table.TransformColumns(Typed, {{"Status", Text.Proper, type text}})
+				in
+				    Result
+
+	annotation PBI_ResultType = Table

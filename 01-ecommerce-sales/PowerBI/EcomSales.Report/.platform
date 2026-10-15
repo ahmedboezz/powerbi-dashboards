@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "EcomSales"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "a1803c80-d487-4ce5-8567-44936d113f1f"
+  }
+}

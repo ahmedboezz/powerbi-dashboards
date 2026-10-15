@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "RestaurantSales"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "56cef8c9-c3de-46ee-a2b8-24e1538ea347"
+  }
+}

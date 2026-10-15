@@ -1,0 +1,72 @@
+// Restaurant Chain Sales & Operations - DAX measures (table _Measures)
+
+// [1 Sales]
+Net Sales =
+    SUM ( Sales[NetSales] )
+
+// [1 Sales]
+Gross Sales =
+    SUM ( Sales[GrossSales] )
+
+// [1 Sales]
+Orders =
+    SUM ( Sales[Orders] )
+
+// [1 Sales]
+Avg Ticket =
+    DIVIDE ( [Net Sales], [Orders] )
+
+// [1 Sales]
+Items per Order =
+    DIVIDE ( SUM ( Sales[Items] ), [Orders] )
+
+// [1 Sales]
+Orders per Day =
+    DIVIDE ( [Orders], DISTINCTCOUNT ( 'Date'[Date] ) )
+
+// [1 Sales]
+Sales per Seat =
+    DIVIDE ( [Net Sales], SUM ( Branches[Seats] ) )
+
+// [2 Cost]
+Food Cost =
+    SUM ( Sales[FoodCost] )
+
+// [2 Cost]
+Food Cost % =
+    DIVIDE ( [Food Cost], [Gross Sales] )
+
+// [2 Cost]
+Aggregator Commission =
+    VAR x = SUM ( Sales[Commission] ) RETURN IF ( x > 0, x )
+
+// [2 Cost] Net sales after food cost and platform commission
+Contribution =
+    [Net Sales] - [Food Cost] - [Aggregator Commission]
+
+// [2 Cost]
+Contribution % =
+    DIVIDE ( [Contribution], [Net Sales] )
+
+// [3 Service] Order-weighted kitchen preparation time
+Avg Prep Minutes =
+    DIVIDE ( SUM ( Sales[PrepMinutesTotal] ), [Orders] )
+
+// [3 Service]
+Avg Rating =
+    DIVIDE ( SUM ( Sales[RatingPoints] ), SUM ( Sales[Ratings] ) )
+
+// [3 Service]
+Delivery Share % =
+    DIVIDE ( CALCULATE ( [Orders], Sales[OrderType] = "Delivery" ), [Orders] )
+
+// [4 Time intelligence]
+Net Sales YoY % =
+    VAR yr = MAX ( 'Date'[Year] )
+VAR cur = CALCULATE ( [Net Sales], 'Date'[Year] = yr )
+VAR prev = CALCULATE ( [Net Sales], 'Date'[Year] = yr - 1 )
+RETURN DIVIDE ( cur - prev, prev )
+
+// [4 Time intelligence]
+Net Sales PY =
+    CALCULATE ( [Net Sales], SAMEPERIODLASTYEAR ( 'Date'[Date] ) )

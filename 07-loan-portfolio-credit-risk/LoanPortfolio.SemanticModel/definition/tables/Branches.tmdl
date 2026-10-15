@@ -1,0 +1,45 @@
+table Branches
+	lineageTag: 070eac07-2fa5-523d-9c31-fa1b6d90a6cf
+
+	column BranchCode
+		dataType: string
+		lineageTag: 705f6f42-7ea3-5648-8f13-7d06863f165b
+		summarizeBy: none
+		sourceColumn: BranchCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column BranchName
+		dataType: string
+		lineageTag: 324cb8eb-9472-56b5-a8c1-5e4ca6538431
+		summarizeBy: none
+		sourceColumn: BranchName
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 2108abe9-29f3-5c67-bce0-b35cb1ce1067
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: b26aa2d9-6b72-52a4-a4b0-0c4e553c5f38
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Branches = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "branches.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true])
+				in
+				    Promoted
+
+	annotation PBI_ResultType = Table

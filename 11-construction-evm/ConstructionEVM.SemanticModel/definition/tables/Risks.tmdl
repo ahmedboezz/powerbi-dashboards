@@ -1,0 +1,84 @@
+table Risks
+	lineageTag: 1e73c468-27e6-5c6b-adc8-d4a2f20b77ad
+
+	column RiskID
+		dataType: string
+		lineageTag: da62d941-f6e3-5a69-9a36-0b632c143a42
+		summarizeBy: none
+		sourceColumn: RiskID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProjectID
+		dataType: string
+		lineageTag: 09a1e4c0-d169-52b1-8e9e-fb774826b8c4
+		summarizeBy: none
+		sourceColumn: ProjectID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Category
+		dataType: string
+		lineageTag: a05754dc-fb59-50a4-84de-98604dc7b8d8
+		summarizeBy: none
+		sourceColumn: Category
+
+		annotation SummarizationSetBy = Automatic
+
+	column Probability
+		dataType: int64
+		formatString: 0
+		lineageTag: 594e77c8-ef98-5110-8741-b628b9f1dd7a
+		summarizeBy: none
+		sourceColumn: Probability
+
+		annotation SummarizationSetBy = Automatic
+
+	column Impact
+		dataType: int64
+		formatString: 0
+		lineageTag: 8e59c551-41fc-5837-b517-1a8d419085a9
+		summarizeBy: none
+		sourceColumn: Impact
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: ba60871c-3229-5f92-97b6-a906e355e4e1
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Risk Score'
+		dataType: int64
+		formatString: 0
+		lineageTag: fc52b4a4-2777-5018-9963-e61cd0bb4b2d
+		summarizeBy: none
+		sourceColumn: Risk Score
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Risk Level'
+		dataType: string
+		lineageTag: 2e446b65-8490-52eb-8ef3-f95a7bebeea5
+		summarizeBy: none
+		sourceColumn: Risk Level
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Risks = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "risk_register.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+
+				    Typed = Table.TransformColumnTypes(Promoted, {{"Probability", Int64.Type}, {"Impact", Int64.Type}}, "en-US"),
+				    Score = Table.AddColumn(Typed, "Risk Score", each [Probability] * [Impact], Int64.Type),
+				    Result = Table.AddColumn(Score, "Risk Level", each if [Risk Score] >= 15 then "High" else if [Risk Score] >= 8 then "Medium" else "Low", type text)
+				in
+				    Result
+
+	annotation PBI_ResultType = Table

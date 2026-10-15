@@ -1,0 +1,38 @@
+{
+  "name": "LoanApps Theme",
+  "dataColors": [
+    "#0B2545",
+    "#C9A227",
+    "#3E7CB1",
+    "#8DA9C4",
+    "#B5651D",
+    "#6B7280",
+    "#0EA5E9",
+    "#D946EF",
+    "#84CC16",
+    "#F97316"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#0B2545",
+  "tableAccent": "#0B2545",
+  "good": "#10B981",
+  "neutral": "#F59E0B",
+  "bad": "#EF4444",
+  "textClasses": {
+    "label": {
+      "fontFace": "Segoe UI",
+      "fontSize": 9,
+      "color": "#4A5866"
+    },
+    "title": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 12,
+      "color": "#0B2545"
+    },
+    "callout": {
+      "fontFace": "Segoe UI Semibold",
+      "fontSize": 20,
+      "color": "#0B2545"
+    }
+  }
+}

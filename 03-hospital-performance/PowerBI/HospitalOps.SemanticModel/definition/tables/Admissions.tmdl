@@ -1,0 +1,155 @@
+table Admissions
+	lineageTag: 56dfe689-9a57-5ca7-9300-b8b453cd0d4d
+
+	column AdmissionID
+		dataType: string
+		lineageTag: 6f64c719-6d08-5e0c-8bc6-c35a79ed1fff
+		summarizeBy: none
+		sourceColumn: AdmissionID
+
+		annotation SummarizationSetBy = Automatic
+
+	column AdmissionDate
+		dataType: dateTime
+		lineageTag: c3520bef-19b1-5795-a372-be245a563412
+		summarizeBy: none
+		sourceColumn: AdmissionDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column DischargeDate
+		dataType: dateTime
+		formatString: dd mmm yyyy
+		lineageTag: 2c96742b-dbd9-5089-895e-eef9d150c2f5
+		summarizeBy: none
+		sourceColumn: DischargeDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ArrivalDay
+		dataType: string
+		lineageTag: 81a7b8f0-f97a-5a3e-a843-dd842d30d742
+		summarizeBy: none
+		sourceColumn: ArrivalDay
+		sortByColumn: 'ArrivalDay Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Department
+		dataType: string
+		isHidden
+		lineageTag: 2e40d7bc-00ab-5981-b63a-d01bbe5bbb6c
+		summarizeBy: none
+		sourceColumn: Department
+
+		annotation SummarizationSetBy = Automatic
+
+	column AdmissionType
+		dataType: string
+		lineageTag: 10380473-00fb-5bef-a1cb-14a79921fb85
+		summarizeBy: none
+		sourceColumn: AdmissionType
+
+		annotation SummarizationSetBy = Automatic
+
+	column Gender
+		dataType: string
+		lineageTag: b0d5fbbd-ef85-5ee4-949c-8d86127adcfc
+		summarizeBy: none
+		sourceColumn: Gender
+
+		annotation SummarizationSetBy = Automatic
+
+	column AgeGroup
+		dataType: string
+		lineageTag: 92171a89-9a20-5cc7-9589-e00cc7c94a43
+		summarizeBy: none
+		sourceColumn: AgeGroup
+
+		annotation SummarizationSetBy = Automatic
+
+	column Insurance
+		dataType: string
+		lineageTag: b02e7676-178c-5f4d-baf2-c32c5ee67509
+		summarizeBy: none
+		sourceColumn: Insurance
+
+		annotation SummarizationSetBy = Automatic
+
+	column LengthOfStay
+		dataType: int64
+		lineageTag: 4cd0531d-9174-581d-879e-a3b0e9e5b674
+		summarizeBy: sum
+		sourceColumn: LengthOfStay
+
+		annotation SummarizationSetBy = Automatic
+
+	column ERWaitMinutes
+		dataType: double
+		formatString: 0
+		lineageTag: afded865-4c34-525a-a54e-486676d0adb4
+		summarizeBy: sum
+		sourceColumn: ERWaitMinutes
+
+		annotation SummarizationSetBy = Automatic
+
+	column TreatmentCost
+		dataType: double
+		formatString: \$#,0
+		lineageTag: 9a7b56bb-8fc8-596f-9fef-1d3ed1cf2bc0
+		summarizeBy: sum
+		sourceColumn: TreatmentCost
+
+		annotation SummarizationSetBy = Automatic
+
+	column Readmitted30
+		dataType: int64
+		lineageTag: 6c2034bc-271b-5eea-9130-d9ad343314ee
+		summarizeBy: sum
+		sourceColumn: Readmitted30
+
+		annotation SummarizationSetBy = Automatic
+
+	column Satisfaction
+		dataType: int64
+		formatString: 0
+		lineageTag: 91638b98-a3d4-5837-a4f8-438224e12aab
+		summarizeBy: none
+		sourceColumn: Satisfaction
+
+		annotation SummarizationSetBy = Automatic
+
+	column Outcome
+		dataType: string
+		lineageTag: b56cc96d-687f-5809-b20f-c7fb07316a29
+		summarizeBy: none
+		sourceColumn: Outcome
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ArrivalDay Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 67720289-f609-5909-99d0-70b23f78717b
+		summarizeBy: none
+		sourceColumn: ArrivalDay Order
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Admissions = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "admissions.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"AdmissionID", type text}, {"AdmissionDate", type date}, {"DischargeDate", type date}, {"ArrivalDay", type text}, {"Department", type text}, {"AdmissionType", type text}, {"Gender", type text}, {"AgeGroup", type text}, {"Insurance", type text}, {"LengthOfStay", Int64.Type}, {"ERWaitMinutes", type number}, {"TreatmentCost", type number}, {"Readmitted30", Int64.Type}, {"Satisfaction", Int64.Type}, {"Outcome", type text}, {"ArrivalDay Order", Int64.Type}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

@@ -1,0 +1,186 @@
+table Sales
+	lineageTag: 4052eacd-329d-5127-aa13-5b3cc8988068
+
+	column OrderDate
+		dataType: dateTime
+		lineageTag: 886930f0-d529-5a09-9e39-c8e976961c78
+		summarizeBy: none
+		sourceColumn: OrderDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Weekday
+		dataType: string
+		lineageTag: bfa42801-3519-5170-9742-73f7816f750d
+		summarizeBy: none
+		sourceColumn: Weekday
+		sortByColumn: 'Weekday Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Branch
+		dataType: string
+		isHidden
+		lineageTag: e887a454-ba49-5692-a4ae-5096354cc595
+		summarizeBy: none
+		sourceColumn: Branch
+
+		annotation SummarizationSetBy = Automatic
+
+	column DayPart
+		dataType: string
+		lineageTag: 294ff1f5-8756-5942-b9c3-2fc1b39af507
+		summarizeBy: none
+		sourceColumn: DayPart
+		sortByColumn: 'DayPart Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column OrderType
+		dataType: string
+		lineageTag: 3ebee173-0ef9-5fe2-ae38-86dbf3816799
+		summarizeBy: none
+		sourceColumn: OrderType
+		sortByColumn: 'OrderType Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Orders
+		dataType: int64
+		lineageTag: 580326e2-d72d-57b8-870d-94f4b201a95f
+		summarizeBy: sum
+		sourceColumn: Orders
+
+		annotation SummarizationSetBy = Automatic
+
+	column Items
+		dataType: int64
+		lineageTag: 882aadba-0d46-584c-822c-ebd04ff02f89
+		summarizeBy: sum
+		sourceColumn: Items
+
+		annotation SummarizationSetBy = Automatic
+
+	column GrossSales
+		dataType: double
+		formatString: \$#,0.00
+		lineageTag: 38edf942-e10d-5753-ae12-f666b25096d6
+		summarizeBy: sum
+		sourceColumn: GrossSales
+
+		annotation SummarizationSetBy = Automatic
+
+	column Discount
+		dataType: double
+		formatString: \$#,0.00
+		lineageTag: 290ead45-ebb3-56ac-8054-65b06bc058a8
+		summarizeBy: sum
+		sourceColumn: Discount
+
+		annotation SummarizationSetBy = Automatic
+
+	column NetSales
+		dataType: double
+		formatString: \$#,0.00
+		lineageTag: 3e146643-9bd0-5651-98bc-f66fd96159d1
+		summarizeBy: sum
+		sourceColumn: NetSales
+
+		annotation SummarizationSetBy = Automatic
+
+	column FoodCost
+		dataType: double
+		formatString: \$#,0.00
+		lineageTag: 4c81c85e-77e0-59a9-b341-752418d1ab91
+		summarizeBy: sum
+		sourceColumn: FoodCost
+
+		annotation SummarizationSetBy = Automatic
+
+	column Commission
+		dataType: double
+		formatString: \$#,0.00
+		lineageTag: 84e806f1-9872-572c-bdc8-1b9f297f807a
+		summarizeBy: sum
+		sourceColumn: Commission
+
+		annotation SummarizationSetBy = Automatic
+
+	column AvgPrepMinutes
+		dataType: double
+		isHidden
+		formatString: 0.0
+		lineageTag: 04edd52d-c21f-5556-976c-2b3879c0f1ce
+		summarizeBy: sum
+		sourceColumn: AvgPrepMinutes
+
+		annotation SummarizationSetBy = Automatic
+
+	column PrepMinutesTotal
+		dataType: double
+		lineageTag: 0ddad5af-dacd-5e13-9bd3-822e6fd167f7
+		summarizeBy: sum
+		sourceColumn: PrepMinutesTotal
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ratings
+		dataType: int64
+		lineageTag: 5328af63-ba29-5a7c-961d-fe04b7a23259
+		summarizeBy: sum
+		sourceColumn: Ratings
+
+		annotation SummarizationSetBy = Automatic
+
+	column RatingPoints
+		dataType: int64
+		lineageTag: 2d9759c6-16b9-5343-899f-3f1e9a46e818
+		summarizeBy: sum
+		sourceColumn: RatingPoints
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Weekday Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9207c253-90e0-5eb9-b0e3-019e03f063ec
+		summarizeBy: none
+		sourceColumn: Weekday Order
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'DayPart Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 80451401-fa8d-502d-b31c-918f937341d2
+		summarizeBy: none
+		sourceColumn: DayPart Order
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'OrderType Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 98db283d-5f61-5254-a233-9b63feed8899
+		summarizeBy: none
+		sourceColumn: OrderType Order
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Sales = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "sales.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"OrderDate", type date}, {"Weekday", type text}, {"Branch", type text}, {"DayPart", type text}, {"OrderType", type text}, {"Orders", Int64.Type}, {"Items", Int64.Type}, {"GrossSales", type number}, {"Discount", type number}, {"NetSales", type number}, {"FoodCost", type number}, {"Commission", type number}, {"AvgPrepMinutes", type number}, {"PrepMinutesTotal", type number}, {"Ratings", Int64.Type}, {"RatingPoints", Int64.Type}, {"Weekday Order", Int64.Type}, {"DayPart Order", Int64.Type}, {"OrderType Order", Int64.Type}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

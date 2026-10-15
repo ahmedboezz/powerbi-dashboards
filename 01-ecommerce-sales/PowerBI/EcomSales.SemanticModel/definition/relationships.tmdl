@@ -1,0 +1,8 @@
+relationship 8f730f4a-e7b9-526d-bb50-7824b3ba762a
+	fromColumn: Sales.Product
+	toColumn: Products.Product
+
+relationship 5ead63c7-d578-5765-9a2a-c776b70d5582
+	fromColumn: Sales.OrderDate
+	toColumn: Date.Date
+

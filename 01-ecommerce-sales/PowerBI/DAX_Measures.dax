@@ -1,0 +1,75 @@
+// E-Commerce Sales Performance - DAX measures (table _Measures)
+
+// [1 Sales]
+Revenue =
+    SUM ( Sales[Revenue] )
+
+// [1 Sales]
+Profit =
+    SUM ( Sales[Profit] )
+
+// [1 Sales]
+Orders =
+    COUNTROWS ( Sales )
+
+// [1 Sales]
+Units Sold =
+    SUM ( Sales[Quantity] )
+
+// [1 Sales]
+Avg Order Value =
+    DIVIDE ( [Revenue], [Orders] )
+
+// [1 Sales]
+Profit Margin % =
+    DIVIDE ( [Profit], [Revenue] )
+
+// [2 Returns & CX]
+Returned Orders =
+    SUM ( Sales[Returned] )
+
+// [2 Returns & CX]
+Return Rate % =
+    DIVIDE ( [Returned Orders], [Orders] )
+
+// [2 Returns & CX]
+Avg Rating =
+    AVERAGE ( Sales[Rating] )
+
+// [2 Returns & CX]
+Avg Delivery Days =
+    AVERAGE ( Sales[DeliveryDays] )
+
+// [3 Time intelligence] Revenue in the same period of the previous year
+Revenue PY =
+    CALCULATE ( [Revenue], SAMEPERIODLASTYEAR ( 'Date'[Date] ) )
+
+// [3 Time intelligence] Latest year in context vs the year before
+Revenue YoY % =
+    VAR yr = MAX ( 'Date'[Year] )
+VAR cur = CALCULATE ( [Revenue], 'Date'[Year] = yr )
+VAR prev = CALCULATE ( [Revenue], 'Date'[Year] = yr - 1 )
+RETURN DIVIDE ( cur - prev, prev )
+
+// [3 Time intelligence]
+Orders PY =
+    CALCULATE ( [Orders], SAMEPERIODLASTYEAR ( 'Date'[Date] ) )
+
+// [3 Time intelligence] Latest year in context vs the year before
+Orders YoY % =
+    VAR yr = MAX ( 'Date'[Year] )
+VAR cur = CALCULATE ( [Orders], 'Date'[Year] = yr )
+VAR prev = CALCULATE ( [Orders], 'Date'[Year] = yr - 1 )
+RETURN DIVIDE ( cur - prev, prev )
+
+// [3 Time intelligence]
+Revenue YTD =
+    TOTALYTD ( [Revenue], 'Date'[Date] )
+
+// [1 Sales]
+Mobile App Share % =
+    DIVIDE ( CALCULATE ( [Revenue], Sales[Channel] = "Mobile App" ), [Revenue] )
+
+// [1 Sales] Rank of the product by revenue across all products
+Product Rank =
+    IF ( HASONEVALUE ( Products[Product] ), RANKX ( ALL ( Products ), [Revenue] ) )

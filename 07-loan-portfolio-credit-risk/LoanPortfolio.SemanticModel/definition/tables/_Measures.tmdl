@@ -1,0 +1,184 @@
+table _Measures
+	lineageTag: b91f61c3-2ce2-5851-a164-812972f2a7d4
+
+	/// Month-end used for balance measures: end of the selected period
+	measure 'Snapshot Date' =
+			VAR LastData = CALCULATE ( MAX ( Performance[SnapshotDate] ), REMOVEFILTERS () )
+			RETURN MIN ( MAX ( 'Date'[Date] ), LastData )
+		formatString: dd/mm/yyyy
+		displayFolder: 0 Helpers
+		lineageTag: fd366c8e-8e6a-5c31-b643-c74deb4e6358
+
+	/// Outstanding principal at the end of the selected period
+	measure Outstanding =
+			VAR d = [Snapshot Date]
+			RETURN CALCULATE ( SUM ( Performance[OutstandingPrincipal] ), Performance[SnapshotDate] = d )
+		formatString: #,0
+		displayFolder: 1 Portfolio
+		lineageTag: 3390a65d-b9e4-523b-a5f6-8380d8ab51a6
+
+	measure 'Active Loans' =
+			VAR d = [Snapshot Date]
+			RETURN CALCULATE ( COUNTROWS ( Performance ), Performance[SnapshotDate] = d, Performance[OutstandingPrincipal] > 0 )
+		formatString: #,0
+		displayFolder: 1 Portfolio
+		lineageTag: d2c595dc-e597-52bb-a594-a8c202a01ba7
+
+	measure 'Outstanding MoM %' =
+			VAR cur = [Outstanding]
+			VAR prev = CALCULATE ( [Outstanding], DATEADD ( 'Date'[Date], -1, MONTH ) )
+			RETURN DIVIDE ( cur - prev, prev )
+		formatString: 0.0%
+		displayFolder: 1 Portfolio
+		lineageTag: b0f41940-101d-50d6-acb5-8615b58ac2ef
+
+	measure '% of Portfolio' = DIVIDE ( [Outstanding], CALCULATE ( [Outstanding], REMOVEFILTERS ( Bucket ) ) )
+		formatString: 0.0%
+		displayFolder: 1 Portfolio
+		lineageTag: c8c4f922-f95c-5ce1-852a-d801cd7bcd10
+
+	/// New financing booked in the selected period (virtual relationship via TREATAS)
+	measure 'Disbursed Amount' = CALCULATE ( SUM ( Loans[Principal] ), TREATAS ( VALUES ( 'Date'[Date] ), Loans[DisbursementDate] ) )
+		formatString: #,0
+		displayFolder: 2 Originations
+		lineageTag: 4b49af54-4a9e-59e4-911f-3915d57b0808
+
+	measure 'Loans Disbursed' = CALCULATE ( COUNTROWS ( Loans ), TREATAS ( VALUES ( 'Date'[Date] ), Loans[DisbursementDate] ) )
+		formatString: #,0
+		displayFolder: 2 Originations
+		lineageTag: 422358a7-6b3b-5f81-88d0-c2bc5f83e250
+
+	measure 'Avg Ticket Size' = DIVIDE ( [Disbursed Amount], [Loans Disbursed] )
+		formatString: #,0
+		displayFolder: 2 Originations
+		lineageTag: 95fa8e21-4cbe-5dd9-960a-03ddd957dcc4
+
+	measure 'Wtd Avg Profit Rate' =
+			CALCULATE (
+			    DIVIDE ( SUMX ( Loans, Loans[Principal] * Loans[ProfitRate] ), SUM ( Loans[Principal] ) ),
+			    TREATAS ( VALUES ( 'Date'[Date] ), Loans[DisbursementDate] )
+			)
+		formatString: 0.00%
+		displayFolder: 2 Originations
+		lineageTag: 2b9e0eca-3418-5699-80c7-74cf76bda4d7
+
+	/// Outstanding of loans 90+ days past due
+	measure 'NPL Balance' = CALCULATE ( [Outstanding], Bucket[Bucket] = "90+" )
+		formatString: #,0
+		displayFolder: 3 Credit Risk
+		lineageTag: 7d0d777b-2a60-537f-8723-0354208a411f
+
+	measure 'PAR30 Balance' = CALCULATE ( [Outstanding], Bucket[Bucket] IN { "30-59", "60-89", "90+" } )
+		formatString: #,0
+		displayFolder: 3 Credit Risk
+		lineageTag: de5a4d31-e601-544a-90de-a3aa4fad70f4
+
+	measure 'NPL %' = DIVIDE ( [NPL Balance], [Outstanding] )
+		formatString: 0.0%
+		displayFolder: 3 Credit Risk
+		lineageTag: ab4728cd-e8b6-5364-8b4f-dc1cc5eeab17
+
+	measure 'PAR30 %' = DIVIDE ( [PAR30 Balance], [Outstanding] )
+		formatString: 0.0%
+		displayFolder: 3 Credit Risk
+		lineageTag: 89f76018-ed3b-569f-87eb-9aae8660bcbc
+
+	measure 'Early Delinquency %' = DIVIDE ( CALCULATE ( [Outstanding], Bucket[Bucket] = "1-29" ), [Outstanding] )
+		formatString: 0.0%
+		displayFolder: 3 Credit Risk
+		lineageTag: 2ff5bb7a-79a5-547b-8931-baab0fe32811
+
+	measure 'Delinquent Balance' = CALCULATE ( [Outstanding], KEEPFILTERS ( Bucket[Bucket] IN { "1-29", "30-59", "60-89", "90+" } ) )
+		formatString: #,0
+		displayFolder: 3 Credit Risk
+		lineageTag: b289e384-2ab6-56c5-a436-d83b32d794bb
+
+	/// Expected credit loss = balance x stage coverage rate (simplified)
+	measure ECL =
+			VAR d = [Snapshot Date]
+			RETURN
+			    CALCULATE (
+			        SUMX ( Performance, Performance[OutstandingPrincipal] * RELATED ( Stages[ECL Rate] ) ),
+			        Performance[SnapshotDate] = d
+			    )
+		formatString: #,0
+		displayFolder: 4 IFRS 9
+		lineageTag: cf152ed4-ac66-5cbf-8242-5bfb25dd7563
+
+	measure 'Coverage %' = DIVIDE ( [ECL], [Outstanding] )
+		formatString: 0.0%
+		displayFolder: 4 IFRS 9
+		lineageTag: f7b1f63b-3729-5136-b1ec-89409108a364
+
+	measure 'Amount Due' = SUM ( Performance[AmountDue] )
+		formatString: #,0
+		displayFolder: 5 Collections
+		lineageTag: 2076fd3e-3eea-59b7-9b43-b32ddda4b16c
+
+	measure Collected = SUM ( Performance[AmountCollected] )
+		formatString: #,0
+		displayFolder: 5 Collections
+		lineageTag: 5426e793-f020-5e54-a5da-d756b57ae786
+
+	/// Collections (incl. arrears recovered) / scheduled installments of the period
+	measure 'Collection Efficiency %' = DIVIDE ( [Collected], [Amount Due] )
+		formatString: 0.0%
+		displayFolder: 5 Collections
+		lineageTag: 49fc96a3-38f2-5fe7-8d4d-ee70a6987c98
+
+	measure 'Write-offs' = SUM ( Performance[WriteOffAmount] )
+		formatString: #,0
+		displayFolder: 5 Collections
+		lineageTag: bd1fef3e-09f4-5fc3-a004-51620c08f701
+
+	measure 'Loan Months' = COUNTROWS ( Performance )
+		formatString: #,0
+		displayFolder: 6 Roll Rates
+		lineageTag: 11a988ad-6fe4-54dc-b9bb-bec8f37327b6
+
+	/// Share of loans in a previous-month bucket that moved to each current bucket
+	measure 'Roll Rate %' = DIVIDE ( [Loan Months], CALCULATE ( [Loan Months], REMOVEFILTERS ( Bucket ) ) )
+		formatString: 0.0%
+		displayFolder: 6 Roll Rates
+		lineageTag: 8c01118b-ee73-5b36-9042-0f6c1e0151d9
+
+	/// Balance 30+ DPD / balance, by months on book
+	measure 'Vintage 30+ %' =
+			DIVIDE (
+			    CALCULATE ( SUM ( Performance[OutstandingPrincipal] ), Bucket[Bucket] IN { "30-59", "60-89", "90+" } ),
+			    SUM ( Performance[OutstandingPrincipal] )
+			)
+		formatString: 0.0%
+		displayFolder: 6 Roll Rates
+		lineageTag: 0b6995ce-5a8d-537c-858f-8a5a8df89e8c
+
+	measure 'Current DPD' =
+			VAR d = [Snapshot Date]
+			RETURN CALCULATE ( MAX ( Performance[DPD] ), Performance[SnapshotDate] = d )
+		formatString: 0
+		displayFolder: 3 Credit Risk
+		lineageTag: 04afe21e-0a11-5c18-b9a3-944c0fc12ddf
+
+	measure 'DPD (NPL loans)' = IF ( [NPL Balance] > 0, [Current DPD] )
+		formatString: 0
+		displayFolder: 3 Credit Risk
+		lineageTag: a116a06f-fb31-55f6-967b-004451ca13a1
+
+	column Dummy
+		dataType: string
+		isHidden
+		lineageTag: 202e5d6e-c090-5ea9-acc2-c1e9e486a65e
+		summarizeBy: none
+		sourceColumn: Dummy
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Dummy = text], {})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

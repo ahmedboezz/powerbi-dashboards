@@ -1,0 +1,50 @@
+table Products
+	lineageTag: e666eed4-17a8-58ed-b159-d8823102d9ce
+
+	column Product
+		dataType: string
+		lineageTag: db016032-7846-5367-9496-6be7db123442
+		summarizeBy: none
+		sourceColumn: Product
+		sortByColumn: 'Product Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Type'
+		dataType: string
+		lineageTag: 7cef7281-9e3c-5e61-9ec0-fe909ee27792
+		summarizeBy: none
+		sourceColumn: Product Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'SLA Days'
+		dataType: int64
+		lineageTag: 0515df2a-dafc-50e9-b8d3-2b94064c30c4
+		summarizeBy: sum
+		sourceColumn: SLA Days
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 095e2b5e-dd00-5f4e-90ae-cf9b462ba96b
+		summarizeBy: none
+		sourceColumn: Product Order
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Products = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "products.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"Product", type text}, {"Product Type", type text}, {"SLA Days", Int64.Type}, {"Product Order", Int64.Type}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

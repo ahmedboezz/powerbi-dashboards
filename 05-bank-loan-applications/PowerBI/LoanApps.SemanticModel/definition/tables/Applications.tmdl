@@ -1,0 +1,182 @@
+table Applications
+	lineageTag: efde4449-0876-5a10-96b1-e8f5a8f22a97
+
+	column ApplicationID
+		dataType: string
+		lineageTag: 34e8e03a-61fb-5bbc-899b-51c57bf678a2
+		summarizeBy: none
+		sourceColumn: ApplicationID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ApplicationDate
+		dataType: dateTime
+		lineageTag: b6dcf57d-efee-5f0d-8e4f-cc9f3da47289
+		summarizeBy: none
+		sourceColumn: ApplicationDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Product
+		dataType: string
+		isHidden
+		lineageTag: 8da9e634-23a7-588d-8689-ed4e86747434
+		summarizeBy: none
+		sourceColumn: Product
+		sortByColumn: 'Product Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Channel
+		dataType: string
+		lineageTag: 61b85ade-2e10-513e-a3b0-bc8d6efcfcbf
+		summarizeBy: none
+		sourceColumn: Channel
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: 222558e3-a70c-565d-bb15-5babbd7adb52
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column EmploymentType
+		dataType: string
+		lineageTag: 03fdb7ef-0497-56f1-93ee-463a12ac10b5
+		summarizeBy: none
+		sourceColumn: EmploymentType
+
+		annotation SummarizationSetBy = Automatic
+
+	column CreditScoreBand
+		dataType: string
+		lineageTag: d2cfb977-8f93-5fd0-9bce-c3b54c865317
+		summarizeBy: none
+		sourceColumn: CreditScoreBand
+		sortByColumn: 'CreditScoreBand Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthlyIncome
+		dataType: double
+		formatString: \$#,0
+		lineageTag: 02069642-91c5-542b-8b42-146ced27d1cf
+		summarizeBy: sum
+		sourceColumn: MonthlyIncome
+
+		annotation SummarizationSetBy = Automatic
+
+	column RequestedAmount
+		dataType: double
+		formatString: \$#,0
+		lineageTag: 731afc6a-ff65-58d0-8e6a-d82158a8d8e7
+		summarizeBy: sum
+		sourceColumn: RequestedAmount
+
+		annotation SummarizationSetBy = Automatic
+
+	column TermMonths
+		dataType: int64
+		formatString: 0
+		lineageTag: b0983bd7-9f7e-5a26-8863-030390dceedd
+		summarizeBy: none
+		sourceColumn: TermMonths
+
+		annotation SummarizationSetBy = Automatic
+
+	column DebtToIncome
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 78af1631-176d-5903-83af-00493346e5fb
+		summarizeBy: none
+		sourceColumn: DebtToIncome
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: b40f7ff2-1ba1-5c61-82de-fc67be2098b2
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column RejectionReason
+		dataType: string
+		lineageTag: 2505fc0e-a910-57b5-9187-662bb2a1087e
+		summarizeBy: none
+		sourceColumn: RejectionReason
+
+		annotation SummarizationSetBy = Automatic
+
+	column ApprovedAmount
+		dataType: double
+		formatString: \$#,0
+		lineageTag: 2bbbd7fe-6de6-5501-ac5e-b8004a2b2e3f
+		summarizeBy: sum
+		sourceColumn: ApprovedAmount
+
+		annotation SummarizationSetBy = Automatic
+
+	column InterestRate
+		dataType: double
+		formatString: 0.00%
+		lineageTag: 1f9ae3c6-5941-53e0-bfcc-db214784caa9
+		summarizeBy: none
+		sourceColumn: InterestRate
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProcessingDays
+		dataType: int64
+		lineageTag: 2362300a-40b9-5586-861a-72dafda627b0
+		summarizeBy: sum
+		sourceColumn: ProcessingDays
+
+		annotation SummarizationSetBy = Automatic
+
+	column WithinSLA
+		dataType: int64
+		lineageTag: 98379349-0818-5b83-a005-e64adb2283c8
+		summarizeBy: sum
+		sourceColumn: WithinSLA
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'CreditScoreBand Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: b3bd7f3f-8d0e-5b97-b68e-577e8007cf8d
+		summarizeBy: none
+		sourceColumn: CreditScoreBand Order
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Product Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 18b0ea6a-6be5-5be2-a4fe-914bbe3f660f
+		summarizeBy: none
+		sourceColumn: Product Order
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Applications = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "applications.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"ApplicationID", type text}, {"ApplicationDate", type date}, {"Product", type text}, {"Channel", type text}, {"Region", type text}, {"EmploymentType", type text}, {"CreditScoreBand", type text}, {"MonthlyIncome", type number}, {"RequestedAmount", type number}, {"TermMonths", Int64.Type}, {"DebtToIncome", type number}, {"Status", type text}, {"RejectionReason", type text}, {"ApprovedAmount", type number}, {"InterestRate", type number}, {"ProcessingDays", Int64.Type}, {"WithinSLA", Int64.Type}, {"CreditScoreBand Order", Int64.Type}, {"Product Order", Int64.Type}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

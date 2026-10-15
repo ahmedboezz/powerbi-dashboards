@@ -1,0 +1,41 @@
+table Drivers
+	lineageTag: 11664322-8565-5932-a7a5-d30cffa4683b
+
+	column DriverID
+		dataType: string
+		lineageTag: 5ab7441a-8d03-5356-9f4a-e59eda52a811
+		summarizeBy: none
+		sourceColumn: DriverID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Branch
+		dataType: string
+		lineageTag: 85a9e765-6aba-582f-9cba-fd63120c8cd7
+		summarizeBy: none
+		sourceColumn: Branch
+
+		annotation SummarizationSetBy = Automatic
+
+	column HireDate
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 2b4b0db5-dcfd-59ed-a7b8-0c2bc4fc3b0f
+		summarizeBy: none
+		sourceColumn: HireDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition Drivers = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "drivers.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Result = Table.TransformColumnTypes(Promoted, {{"HireDate", type date}}, "en-US")
+				in
+				    Result
+
+	annotation PBI_ResultType = Table

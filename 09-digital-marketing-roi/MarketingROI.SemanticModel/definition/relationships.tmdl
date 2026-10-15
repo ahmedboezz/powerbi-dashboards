@@ -1,0 +1,35 @@
+relationship 46a0eefe-bd72-5625-82f3-ac1d0f4cf883
+	fromColumn: 'Ad Performance'.Date
+	toColumn: Date.Date
+
+relationship b1b83dcc-26af-582b-be29-9678e769152c
+	fromColumn: 'Ad Performance'.CampaignID
+	toColumn: Campaigns.CampaignID
+
+relationship 570bb445-b0e6-5c39-b258-510149ef6df9
+	fromColumn: Campaigns.Channel
+	toColumn: Channels.Channel
+
+relationship f183d101-c0a6-5b3e-8301-e01c1c345fad
+	fromColumn: Budget.Channel
+	toColumn: Channels.Channel
+
+relationship d6cf7df2-23f7-5eff-8f20-a51f23e2597e
+	fromColumn: Budget.Month
+	toColumn: Date.Date
+
+relationship b8d3a00a-8a62-5f1e-8858-3c9c4ffc2195
+	fromColumn: Funnel.Date
+	toColumn: Date.Date
+
+relationship bf8b9a09-b93a-5a20-ae34-bb6a431b4b07
+	fromColumn: Funnel.Channel
+	toColumn: Channels.Channel
+
+relationship 580fd895-d3c3-53cb-b806-60178162daed
+	fromColumn: 'Channel Daily'.Date
+	toColumn: Date.Date
+
+relationship 12e6f910-0d5e-5d21-8d38-516c28544bcb
+	fromColumn: 'Channel Daily'.Channel
+	toColumn: Channels.Channel

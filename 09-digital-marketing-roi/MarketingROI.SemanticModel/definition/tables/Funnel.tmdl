@@ -1,0 +1,66 @@
+/// Website analytics funnel by channel (long format)
+table Funnel
+	lineageTag: 8733a59b-19c2-5e37-b1e4-c08f1e0f5299
+
+	column Date
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 351cc873-dfb8-5a85-9222-291a96a67487
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Channel
+		dataType: string
+		lineageTag: e9866f9c-94f0-50b2-98a4-48fcc30c91cf
+		summarizeBy: none
+		sourceColumn: Channel
+
+		annotation SummarizationSetBy = Automatic
+
+	column Stage
+		dataType: string
+		lineageTag: c75d8f92-df5a-59eb-956e-682fb8e494e3
+		summarizeBy: none
+		sourceColumn: Stage
+		sortByColumn: 'Stage Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Users
+		dataType: int64
+		formatString: #,0
+		lineageTag: 66d66144-f889-5e0d-82f8-cdeed6ca59f8
+		summarizeBy: sum
+		sourceColumn: Users
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Stage Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 9100bd3f-fb75-50c8-a049-2a7e7b003af0
+		summarizeBy: none
+		sourceColumn: Stage Order
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Funnel = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "web_funnel_2025.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"Date", type date}, {"Sessions", Int64.Type}, {"ProductViews", Int64.Type},
+				              {"AddToCart", Int64.Type}, {"CheckoutStarted", Int64.Type}, {"Purchases", Int64.Type}}, "en-US"),
+				    // wide -> long so a funnel visual can use Stage as category
+				    Long = Table.UnpivotOtherColumns(Typed, {"Date", "Channel"}, "Stage", "Users"),
+				    Order = Table.AddColumn(Long, "Stage Order", each List.PositionOf({"Sessions", "ProductViews", "AddToCart", "CheckoutStarted", "Purchases"}, [Stage]), Int64.Type)
+				in
+				    Order
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,149 @@
+table _Measures
+	lineageTag: b91f61c3-2ce2-5851-a164-812972f2a7d4
+
+	/// Budget at completion
+	measure BAC = SUM ( Projects[BAC] )
+		formatString: #,0
+		displayFolder: 1 Baseline
+		lineageTag: 7b8615d1-e0a3-5126-9119-474653710555
+
+	measure Projects = DISTINCTCOUNT ( Projects[ProjectID] )
+		formatString: #,0
+		displayFolder: 1 Baseline
+		lineageTag: 40aa0674-0353-516a-a94d-f3427fe193a9
+
+	/// Cumulative planned value to the end of the selected period
+	measure PV =
+			CALCULATE (
+			    SUM ( Progress[PlannedValue] ),
+			    FILTER ( ALL ( 'Date' ), 'Date'[Date] <= MAX ( 'Date'[Date] ) )
+			)
+		formatString: #,0
+		displayFolder: 2 Earned Value
+		lineageTag: 4ad9fe1e-91e8-5fd8-ad92-301091638aa1
+
+	/// Cumulative earned value (budgeted cost of work performed)
+	measure EV =
+			CALCULATE (
+			    SUM ( Progress[EarnedValue] ),
+			    FILTER ( ALL ( 'Date' ), 'Date'[Date] <= MAX ( 'Date'[Date] ) )
+			)
+		formatString: #,0
+		displayFolder: 2 Earned Value
+		lineageTag: dface29e-3477-5d10-983b-402e73c4b015
+
+	/// Cumulative actual cost
+	measure AC =
+			CALCULATE (
+			    SUM ( Progress[ActualCost] ),
+			    FILTER ( ALL ( 'Date' ), 'Date'[Date] <= MAX ( 'Date'[Date] ) )
+			)
+		formatString: #,0
+		displayFolder: 2 Earned Value
+		lineageTag: 8926a73a-99d8-52ef-beb6-02f8bd87109b
+
+	/// Cost performance index (<1 = over budget)
+	measure CPI = DIVIDE ( [EV], [AC] )
+		formatString: 0.00
+		displayFolder: 2 Earned Value
+		lineageTag: 1bed26a7-b882-50b9-af95-4b2ee709294c
+
+	/// Schedule performance index (<1 = behind schedule)
+	measure SPI = DIVIDE ( [EV], [PV] )
+		formatString: 0.00
+		displayFolder: 2 Earned Value
+		lineageTag: 73b73d30-be5d-5747-a5d4-aaf149fe0bf7
+
+	/// Cost variance
+	measure CV = [EV] - [AC]
+		formatString: #,0
+		displayFolder: 2 Earned Value
+		lineageTag: 685093e4-feb5-5164-9d78-2e2cff832ae5
+
+	/// Schedule variance
+	measure SV = [EV] - [PV]
+		formatString: #,0
+		displayFolder: 2 Earned Value
+		lineageTag: 2dbe77de-2e60-579b-a6e0-b914444c6561
+
+	measure '% Complete' = DIVIDE ( [EV], [BAC] )
+		formatString: 0.0%
+		displayFolder: 2 Earned Value
+		lineageTag: f9599e55-6907-544e-9674-17f0720bb62e
+
+	measure '% Planned' = DIVIDE ( [PV], [BAC] )
+		formatString: 0.0%
+		displayFolder: 2 Earned Value
+		lineageTag: e92c366d-dc19-5666-856a-be6d38b04789
+
+	/// Estimate at completion = BAC / CPI, summed project by project
+	measure EAC =
+			SUMX (
+			    VALUES ( Projects[ProjectID] ),
+			    VAR cpi = [CPI]
+			    RETURN IF ( cpi > 0, CALCULATE ( SUM ( Projects[BAC] ) ) / cpi, CALCULATE ( SUM ( Projects[BAC] ) ) )
+			)
+		formatString: #,0
+		displayFolder: 3 Forecast
+		lineageTag: cd751015-2aae-5539-9552-53785b90833c
+
+	/// Variance at completion (negative = expected overrun)
+	measure VAC = [BAC] - [EAC]
+		formatString: #,0
+		displayFolder: 3 Forecast
+		lineageTag: f6712ab2-d252-5d26-bbaa-64ada3daf35f
+
+	/// Non-cumulative CPI of the month, to spot cost shocks
+	measure 'CPI (month)' = DIVIDE ( SUM ( Progress[EarnedValue] ), SUM ( Progress[ActualCost] ) )
+		formatString: 0.00
+		displayFolder: 3 Forecast
+		lineageTag: 822d8cc5-b39d-5d0a-86fa-e558bf749f17
+
+	measure 'Change Order Value' = SUM ( 'Change Orders'[Amount] )
+		formatString: #,0
+		displayFolder: 4 Change Orders
+		lineageTag: 89363db5-1448-5609-92d3-b342fce12418
+
+	measure 'Approved CO Value' = CALCULATE ( [Change Order Value], 'Change Orders'[Status] = "Approved" )
+		formatString: #,0
+		displayFolder: 4 Change Orders
+		lineageTag: 76239a61-5025-5405-9b07-13c089decf7f
+
+	measure 'Pending CO Value' = CALCULATE ( [Change Order Value], 'Change Orders'[Status] = "Pending" )
+		formatString: #,0
+		displayFolder: 4 Change Orders
+		lineageTag: c2c4624b-9d58-5ffe-8ff4-f1728fcbaabd
+
+	measure 'Change Orders' = COUNTROWS ( 'Change Orders' )
+		formatString: #,0
+		displayFolder: 4 Change Orders
+		lineageTag: 55a8965f-c47d-577b-97b6-1573e029b915
+
+	measure 'Open Risks' = CALCULATE ( COUNTROWS ( Risks ), Risks[Status] = "Open" )
+		formatString: #,0
+		displayFolder: 5 Risks
+		lineageTag: b70106d9-9f99-5a5b-958f-da50f26d71c9
+
+	measure 'High Risks' = CALCULATE ( COUNTROWS ( Risks ), Risks[Status] = "Open", Risks[Risk Score] >= 15 )
+		formatString: #,0
+		displayFolder: 5 Risks
+		lineageTag: 31f0d638-26b3-5702-83a4-769b93913b0b
+
+	column Dummy
+		dataType: string
+		isHidden
+		lineageTag: 202e5d6e-c090-5ea9-acc2-c1e9e486a65e
+		summarizeBy: none
+		sourceColumn: Dummy
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Dummy = text], {})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,85 @@
+/// Borrowers (individuals and SMEs)
+table Customers
+	lineageTag: 77349bd0-0899-5078-8c55-f05f94b1d07f
+
+	column CustomerID
+		dataType: string
+		lineageTag: 1e3054b1-8dd8-59f6-9ba2-4a0c705a7afb
+		summarizeBy: none
+		sourceColumn: CustomerID
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomerType
+		dataType: string
+		lineageTag: 807dc53d-0242-55ea-aef3-e599b2fb550c
+		summarizeBy: none
+		sourceColumn: CustomerType
+
+		annotation SummarizationSetBy = Automatic
+
+	column EmploymentSector
+		dataType: string
+		lineageTag: 24daeb9f-e7ac-50e7-a6b2-8772dfe53773
+		summarizeBy: none
+		sourceColumn: EmploymentSector
+
+		annotation SummarizationSetBy = Automatic
+
+	column Gender
+		dataType: string
+		lineageTag: ecfb499f-7e9c-5f78-b4ee-f94e79859fda
+		summarizeBy: none
+		sourceColumn: Gender
+
+		annotation SummarizationSetBy = Automatic
+
+	column Nationality
+		dataType: string
+		lineageTag: 4a7dfe4d-5d36-5df8-9ed2-d2a3f737c2fc
+		summarizeBy: none
+		sourceColumn: Nationality
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 713b3415-f1e0-539c-90d5-7c80e63553f3
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column BirthYear
+		dataType: int64
+		formatString: 0
+		lineageTag: 7cf62c69-cc8f-5fb5-a9fd-13870fdbd76a
+		summarizeBy: none
+		sourceColumn: BirthYear
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthlyIncome
+		dataType: double
+		formatString: #,0
+		lineageTag: 5ce0edd7-eea5-5df9-bdfa-1cc527db7c98
+		summarizeBy: sum
+		sourceColumn: MonthlyIncome
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Customers = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "customers.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    // unify city spellings (English variants + Arabic)
+				    CityMap = [riyadh = "Riyadh", RIYADH = "Riyadh", #"الرياض" = "Riyadh", jeddah = "Jeddah", Jedda = "Jeddah", #"جدة" = "Jeddah",
+				               DAMMAM = "Dammam", #"الدمام" = "Dammam", Mecca = "Makkah", #"مكة" = "Makkah", Medina = "Madinah", #"المدينة" = "Madinah"],
+				    City = Table.TransformColumns(Promoted, {{"City", each Record.FieldOrDefault(CityMap, Text.Trim(_), Text.Trim(_)), type text}}),
+				    Typed = Table.TransformColumnTypes(City, {{"BirthYear", Int64.Type}, {"MonthlyIncome", type number}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table

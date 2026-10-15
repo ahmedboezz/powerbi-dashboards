@@ -1,0 +1,162 @@
+table Shipments
+	lineageTag: 29bb8060-b801-5624-924a-d4cb815e58f1
+
+	column ShipmentID
+		dataType: string
+		lineageTag: 89309b18-f300-5e8d-a004-cd7e891f2747
+		summarizeBy: none
+		sourceColumn: ShipmentID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ShipDate
+		dataType: dateTime
+		lineageTag: f53cbeae-8e0c-5aa6-a08c-efcd8aea02bd
+		summarizeBy: none
+		sourceColumn: ShipDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Carrier
+		dataType: string
+		isHidden
+		lineageTag: ce4d9f3a-7d5d-596a-8354-9fb166b851d1
+		summarizeBy: none
+		sourceColumn: Carrier
+
+		annotation SummarizationSetBy = Automatic
+
+	column Warehouse
+		dataType: string
+		lineageTag: 49958b4c-06f3-534c-ab2b-ce321d70a53e
+		summarizeBy: none
+		sourceColumn: Warehouse
+
+		annotation SummarizationSetBy = Automatic
+
+	column DestinationRegion
+		dataType: string
+		lineageTag: 560ebc32-5420-5ddb-afcc-f269d4d16ac6
+		summarizeBy: none
+		sourceColumn: DestinationRegion
+
+		annotation SummarizationSetBy = Automatic
+
+	column ServiceLevel
+		dataType: string
+		lineageTag: dcd71ac6-b461-50f5-a1cb-ecf30a5be4f2
+		summarizeBy: none
+		sourceColumn: ServiceLevel
+		sortByColumn: 'ServiceLevel Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Mode
+		dataType: string
+		lineageTag: 0596d835-088f-577d-931d-294fe944c54a
+		summarizeBy: none
+		sourceColumn: Mode
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomerType
+		dataType: string
+		lineageTag: 8ff54c7e-90a1-5e54-8365-d2ce03ab1070
+		summarizeBy: none
+		sourceColumn: CustomerType
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeightKg
+		dataType: double
+		formatString: #,0.0
+		lineageTag: 5833ba47-97bd-5970-b116-87fb7a9d433f
+		summarizeBy: sum
+		sourceColumn: WeightKg
+
+		annotation SummarizationSetBy = Automatic
+
+	column DistanceKm
+		dataType: double
+		formatString: #,0
+		lineageTag: dab5a1fb-c20f-56c8-b7e3-8393853a4fd3
+		summarizeBy: sum
+		sourceColumn: DistanceKm
+
+		annotation SummarizationSetBy = Automatic
+
+	column PromisedDays
+		dataType: int64
+		formatString: 0
+		lineageTag: ba190a14-dd7f-5221-8a91-f19cd270f97a
+		summarizeBy: none
+		sourceColumn: PromisedDays
+
+		annotation SummarizationSetBy = Automatic
+
+	column ActualDays
+		dataType: int64
+		formatString: 0
+		lineageTag: 9db2b531-78c4-5606-8b66-0b796e272cc2
+		summarizeBy: none
+		sourceColumn: ActualDays
+
+		annotation SummarizationSetBy = Automatic
+
+	column OnTime
+		dataType: int64
+		lineageTag: fc0938a8-6878-5c59-bfcd-adedc344a9e6
+		summarizeBy: sum
+		sourceColumn: OnTime
+
+		annotation SummarizationSetBy = Automatic
+
+	column DelayDays
+		dataType: int64
+		lineageTag: d8dcbe70-1fe6-5ae0-bf23-1cf559540907
+		summarizeBy: sum
+		sourceColumn: DelayDays
+
+		annotation SummarizationSetBy = Automatic
+
+	column ShippingCost
+		dataType: double
+		formatString: \$#,0.00
+		lineageTag: b80a6a04-ac81-5817-92a2-71b2d93497e6
+		summarizeBy: sum
+		sourceColumn: ShippingCost
+
+		annotation SummarizationSetBy = Automatic
+
+	column Damaged
+		dataType: int64
+		lineageTag: 3b08f037-9c0c-5902-b5d5-cd7085bda6f3
+		summarizeBy: sum
+		sourceColumn: Damaged
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'ServiceLevel Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: c29dd940-cddd-502a-89c2-65f8efd7c30c
+		summarizeBy: none
+		sourceColumn: ServiceLevel Order
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Shipments = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "shipments.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"ShipmentID", type text}, {"ShipDate", type date}, {"Carrier", type text}, {"Warehouse", type text}, {"DestinationRegion", type text}, {"ServiceLevel", type text}, {"Mode", type text}, {"CustomerType", type text}, {"WeightKg", type number}, {"DistanceKm", type number}, {"PromisedDays", Int64.Type}, {"ActualDays", Int64.Type}, {"OnTime", Int64.Type}, {"DelayDays", Int64.Type}, {"ShippingCost", type number}, {"Damaged", Int64.Type}, {"ServiceLevel Order", Int64.Type}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

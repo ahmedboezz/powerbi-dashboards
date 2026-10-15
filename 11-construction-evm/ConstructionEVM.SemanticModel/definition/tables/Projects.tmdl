@@ -1,0 +1,106 @@
+/// Project master: budget at completion (BAC) and baseline dates
+table Projects
+	lineageTag: 1e53a80f-19b7-55ea-9af5-bd9534ee69e4
+
+	column ProjectID
+		dataType: string
+		lineageTag: eae04960-738e-52c8-b5a6-116fbe2cd4a1
+		summarizeBy: none
+		sourceColumn: ProjectID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProjectName
+		dataType: string
+		lineageTag: a4ad8285-f562-5dd7-b34b-0e30626367b2
+		summarizeBy: none
+		sourceColumn: ProjectName
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sector
+		dataType: string
+		lineageTag: acd18f36-9901-5673-b319-d0893071f7af
+		summarizeBy: none
+		sourceColumn: Sector
+
+		annotation SummarizationSetBy = Automatic
+
+	column ClientType
+		dataType: string
+		lineageTag: 11f1f4df-003e-518d-afbe-d69c64b6623c
+		summarizeBy: none
+		sourceColumn: ClientType
+
+		annotation SummarizationSetBy = Automatic
+
+	column City
+		dataType: string
+		lineageTag: 598b5741-c538-5380-a9e4-a0474564b258
+		summarizeBy: none
+		sourceColumn: City
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProjectManager
+		dataType: string
+		lineageTag: 99dcf3d3-62ac-5baf-aa12-60394116f1e7
+		summarizeBy: none
+		sourceColumn: ProjectManager
+
+		annotation SummarizationSetBy = Automatic
+
+	column ContractValue
+		dataType: double
+		formatString: #,0
+		lineageTag: ad5dd50e-5848-5301-beb7-8c7be1fc5b8c
+		summarizeBy: sum
+		sourceColumn: ContractValue
+
+		annotation SummarizationSetBy = Automatic
+
+	column BAC
+		dataType: double
+		formatString: #,0
+		lineageTag: 94849bbe-42c5-53e0-8ab4-e371b6d48dc2
+		summarizeBy: sum
+		sourceColumn: BAC
+
+		annotation SummarizationSetBy = Automatic
+
+	column PlannedStart
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: f207cafc-7338-510e-8c7f-f313517dcd87
+		summarizeBy: none
+		sourceColumn: PlannedStart
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column PlannedFinish
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: ab022d25-acc1-5ce2-846b-ad2207841a2d
+		summarizeBy: none
+		sourceColumn: PlannedFinish
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition Projects = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "projects.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+
+				    Typed = Table.TransformColumnTypes(Promoted, {{"BAC", type number}, {"PlannedStart", type date}, {"PlannedFinish", type date}}, "en-US"),
+				    // contract value exported with thousands separators
+				    Result = Table.TransformColumns(Typed, {{"ContractValue", each Number.From(Text.Remove(_, ","), "en-US"), type number}})
+				in
+				    Result
+
+	annotation PBI_ResultType = Table

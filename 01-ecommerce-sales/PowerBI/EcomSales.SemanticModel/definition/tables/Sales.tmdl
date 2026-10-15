@@ -1,0 +1,142 @@
+table Sales
+	lineageTag: 4052eacd-329d-5127-aa13-5b3cc8988068
+
+	column OrderID
+		dataType: string
+		lineageTag: eb1b8439-ec27-504a-a354-fd0971b388c1
+		summarizeBy: none
+		sourceColumn: OrderID
+
+		annotation SummarizationSetBy = Automatic
+
+	column OrderDate
+		dataType: dateTime
+		lineageTag: 886930f0-d529-5a09-9e39-c8e976961c78
+		summarizeBy: none
+		sourceColumn: OrderDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Channel
+		dataType: string
+		lineageTag: fef376e0-c4be-530b-b766-8debaeec33de
+		summarizeBy: none
+		sourceColumn: Channel
+
+		annotation SummarizationSetBy = Automatic
+
+	column Region
+		dataType: string
+		lineageTag: c84602fd-bbcc-5b98-b3c0-dcff1ed59ef8
+		summarizeBy: none
+		sourceColumn: Region
+
+		annotation SummarizationSetBy = Automatic
+
+	column CustomerType
+		dataType: string
+		lineageTag: 2f85918e-c1aa-5801-a542-79c1cc42c2d6
+		summarizeBy: none
+		sourceColumn: CustomerType
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product
+		dataType: string
+		isHidden
+		lineageTag: 8661fee2-f071-5508-8223-a3872181ece7
+		summarizeBy: none
+		sourceColumn: Product
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quantity
+		dataType: int64
+		lineageTag: 063df9e8-e979-5faa-a1a5-a804e00c55be
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+		annotation SummarizationSetBy = Automatic
+
+	column DiscountPct
+		dataType: double
+		formatString: 0%
+		lineageTag: 71fb670e-8162-5227-af9b-1e30ef406583
+		summarizeBy: sum
+		sourceColumn: DiscountPct
+
+		annotation SummarizationSetBy = Automatic
+
+	column DiscountBand
+		dataType: string
+		lineageTag: e3f2de17-dac8-5e99-a6a7-3d868ff96e3a
+		summarizeBy: none
+		sourceColumn: DiscountBand
+
+		annotation SummarizationSetBy = Automatic
+
+	column Revenue
+		dataType: double
+		formatString: \$#,0
+		lineageTag: d70a233e-d796-5dd7-a604-4e966d2e9c44
+		summarizeBy: sum
+		sourceColumn: Revenue
+
+		annotation SummarizationSetBy = Automatic
+
+	column Cost
+		dataType: double
+		formatString: \$#,0
+		lineageTag: 80bc3de8-0193-503c-b87a-c581d79cddc6
+		summarizeBy: sum
+		sourceColumn: Cost
+
+		annotation SummarizationSetBy = Automatic
+
+	column Profit
+		dataType: double
+		formatString: \$#,0
+		lineageTag: 797aa07e-89ed-52b1-9250-f636e8aed2bb
+		summarizeBy: sum
+		sourceColumn: Profit
+
+		annotation SummarizationSetBy = Automatic
+
+	column Returned
+		dataType: int64
+		lineageTag: 5088a4ba-945f-592d-861f-16ad83b66255
+		summarizeBy: sum
+		sourceColumn: Returned
+
+		annotation SummarizationSetBy = Automatic
+
+	column DeliveryDays
+		dataType: int64
+		lineageTag: 2d65d0ce-8fab-58e6-8f3e-eb0c26a69b9e
+		summarizeBy: sum
+		sourceColumn: DeliveryDays
+
+		annotation SummarizationSetBy = Automatic
+
+	column Rating
+		dataType: int64
+		lineageTag: 3fb17b59-8e3e-5a66-88d0-d1d5efe84fce
+		summarizeBy: sum
+		sourceColumn: Rating
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Sales = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "sales.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"OrderID", type text}, {"OrderDate", type date}, {"Channel", type text}, {"Region", type text}, {"CustomerType", type text}, {"Product", type text}, {"Quantity", Int64.Type}, {"DiscountPct", type number}, {"DiscountBand", type text}, {"Revenue", type number}, {"Cost", type number}, {"Profit", type number}, {"Returned", Int64.Type}, {"DeliveryDays", Int64.Type}, {"Rating", Int64.Type}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

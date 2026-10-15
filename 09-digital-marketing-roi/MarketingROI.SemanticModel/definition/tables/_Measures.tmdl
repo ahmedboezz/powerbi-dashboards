@@ -1,0 +1,160 @@
+table _Measures
+	lineageTag: b91f61c3-2ce2-5851-a164-812972f2a7d4
+
+	measure Spend = SUM ( 'Ad Performance'[Spend] )
+		formatString: #,0
+		displayFolder: 1 Delivery
+		lineageTag: efc25abf-fc4f-568e-9249-c692ffcb6b93
+
+	measure Impressions = SUM ( 'Ad Performance'[Impressions] )
+		formatString: #,0
+		displayFolder: 1 Delivery
+		lineageTag: f71eff07-bdee-59d3-a202-d8d47ca6f002
+
+	measure Clicks = SUM ( 'Ad Performance'[Clicks] )
+		formatString: #,0
+		displayFolder: 1 Delivery
+		lineageTag: 0cf40703-caf6-5f96-9f0f-3036b0c329fb
+
+	/// Click-through rate
+	measure CTR = DIVIDE ( [Clicks], [Impressions] )
+		formatString: 0.00%
+		displayFolder: 1 Delivery
+		lineageTag: 0a430f0e-3cd9-5485-9b81-49a60f8fcc85
+
+	/// Cost per click (SAR)
+	measure CPC = DIVIDE ( [Spend], [Clicks] )
+		formatString: 0.00
+		displayFolder: 1 Delivery
+		lineageTag: 9471aca6-c980-5655-9ca5-2d90201d2a6d
+
+	/// Cost per 1,000 impressions (SAR)
+	measure CPM = DIVIDE ( [Spend], [Impressions] ) * 1000
+		formatString: 0.00
+		displayFolder: 1 Delivery
+		lineageTag: d7ae9ef3-14e8-5660-951d-1b0266ec093a
+
+	measure Conversions = SUM ( 'Ad Performance'[Conversions] )
+		formatString: #,0
+		displayFolder: 2 Results
+		lineageTag: dfc0f278-e14d-523b-8786-871aaad27972
+
+	/// Platform-attributed revenue
+	measure Revenue = SUM ( 'Ad Performance'[Revenue] )
+		formatString: #,0
+		displayFolder: 2 Results
+		lineageTag: 532f067e-4e91-541b-8b25-7e31f1986475
+
+	/// Conversion rate from click
+	measure CVR = DIVIDE ( [Conversions], [Clicks] )
+		formatString: 0.00%
+		displayFolder: 2 Results
+		lineageTag: 7c5b0497-01e1-5f61-b448-8118e4934f0e
+
+	/// Cost per acquisition (SAR)
+	measure CAC = DIVIDE ( [Spend], [Conversions] )
+		formatString: #,0.0
+		displayFolder: 2 Results
+		lineageTag: d39c9066-d12f-5a7e-90a4-14121f1fa4b0
+
+	/// Return on ad spend
+	measure ROAS = DIVIDE ( [Revenue], [Spend] )
+		formatString: 0.00x
+		displayFolder: 2 Results
+		lineageTag: c248569a-ce4a-599c-b511-faf49373797a
+
+	measure 'Planned Budget' = SUM ( Budget[PlannedBudget] )
+		formatString: #,0
+		displayFolder: 3 Budget
+		lineageTag: de002111-41c3-58ba-b6b8-929c805d039a
+
+	/// Actual spend / planned budget
+	measure 'Budget Pacing %' = DIVIDE ( [Spend], [Planned Budget] )
+		formatString: 0.0%
+		displayFolder: 3 Budget
+		lineageTag: 29c0baa7-222a-541c-b14e-b2829c01b914
+
+	measure 'Budget Variance' = [Spend] - [Planned Budget]
+		formatString: #,0
+		displayFolder: 3 Budget
+		lineageTag: f7d3064f-0554-5b56-bc32-0123cfaf1cec
+
+	/// ROAS computed on channel-day level (for spend-band analysis)
+	measure 'Daily ROAS' = DIVIDE ( SUM ( 'Channel Daily'[Revenue] ), SUM ( 'Channel Daily'[Spend] ) )
+		formatString: 0.00x
+		displayFolder: 2 Results
+		lineageTag: d5fc3e16-c40c-5081-949d-60df179d130a
+
+	measure 'Funnel Users' = SUM ( Funnel[Users] )
+		formatString: #,0
+		displayFolder: 4 Funnel
+		lineageTag: 3cf83b44-fc37-51da-a2a3-fd587f73f901
+
+	measure Sessions = CALCULATE ( [Funnel Users], Funnel[Stage] = "Sessions" )
+		formatString: #,0
+		displayFolder: 4 Funnel
+		lineageTag: a04a1f1e-e256-5808-bffb-80b4a96433c2
+
+	measure 'Add to Cart Rate' = DIVIDE ( CALCULATE ( [Funnel Users], Funnel[Stage] = "AddToCart" ), [Sessions] )
+		formatString: 0.0%
+		displayFolder: 4 Funnel
+		lineageTag: 34bebba7-905a-50b0-884c-c2ff0bd963ca
+
+	measure 'Checkout to Purchase %' =
+			DIVIDE (
+			    CALCULATE ( [Funnel Users], Funnel[Stage] = "Purchases" ),
+			    CALCULATE ( [Funnel Users], Funnel[Stage] = "CheckoutStarted" )
+			)
+		formatString: 0.0%
+		displayFolder: 4 Funnel
+		lineageTag: 072793cf-a6d3-5285-8ba9-14ddebe47042
+
+	measure 'Site Conversion Rate' = DIVIDE ( CALCULATE ( [Funnel Users], Funnel[Stage] = "Purchases" ), [Sessions] )
+		formatString: 0.00%
+		displayFolder: 4 Funnel
+		lineageTag: a806c6fc-93d0-5efd-aa56-5b52b24de9c7
+
+	measure 'Selected Budget Change' = SELECTEDVALUE ( 'Budget Change'[Budget Change %], 0 )
+		formatString: +0%;-0%;0%
+		displayFolder: 5 What-if
+		lineageTag: afdb124a-3356-55ea-94f1-28bd684a7ffe
+
+	measure 'Projected Spend' = [Spend] * ( 1 + [Selected Budget Change] )
+		formatString: #,0
+		displayFolder: 5 What-if
+		lineageTag: 7bd6430c-4ad4-5994-92cc-7a133c5d075c
+
+	/// Assumes diminishing returns: conversions scale with spend^0.68 (elasticity estimated from daily spend bands)
+	measure 'Projected Conversions' = [Conversions] * POWER ( 1 + [Selected Budget Change], 0.68 )
+		formatString: #,0
+		displayFolder: 5 What-if
+		lineageTag: 5e360a6f-2c31-531d-94b2-8e968a23cf81
+
+	measure 'Projected Revenue' = DIVIDE ( [Revenue], [Conversions] ) * [Projected Conversions]
+		formatString: #,0
+		displayFolder: 5 What-if
+		lineageTag: 968255ef-5285-5e43-bb36-5513dc54799e
+
+	measure 'Projected ROAS' = DIVIDE ( [Projected Revenue], [Projected Spend] )
+		formatString: 0.00x
+		displayFolder: 5 What-if
+		lineageTag: 1022a111-ef3e-58b2-b3f0-b8770b40aea3
+
+	column Dummy
+		dataType: string
+		isHidden
+		lineageTag: 202e5d6e-c090-5ea9-acc2-c1e9e486a65e
+		summarizeBy: none
+		sourceColumn: Dummy
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Dummy = text], {})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

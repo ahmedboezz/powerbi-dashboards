@@ -1,0 +1,33 @@
+/// Delinquency bucket of the previous month (roll rates)
+table 'Prev Bucket'
+	lineageTag: f4ed7631-af21-5029-bc71-f475d0e19f2f
+
+	column 'Prev Bucket'
+		dataType: string
+		lineageTag: e2c0d2fa-872e-531a-9980-4d5f62eeb3a7
+		summarizeBy: none
+		sourceColumn: Prev Bucket
+		sortByColumn: 'Prev Bucket Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Prev Bucket Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 316786b0-b60b-56f0-9dcd-ad73fb8c6f7d
+		summarizeBy: none
+		sourceColumn: Prev Bucket Order
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Prev Bucket' = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [#"Prev Bucket" = text, #"Prev Bucket Order" = Int64.Type],
+				        {{"New", 0}, {"Current", 1}, {"1-29", 2}, {"30-59", 3}, {"60-89", 4}, {"90+", 5}})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

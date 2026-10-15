@@ -1,0 +1,113 @@
+table _Measures
+	lineageTag: b91f61c3-2ce2-5851-a164-812972f2a7d4
+
+	measure 'Net Sales' = SUM ( Sales[NetSales] )
+		formatString: \$#,0
+		displayFolder: 1 Sales
+		lineageTag: efbcbdc8-4756-5c97-b987-e2cfc79e4521
+
+	measure 'Gross Sales' = SUM ( Sales[GrossSales] )
+		formatString: \$#,0
+		displayFolder: 1 Sales
+		lineageTag: 89d69ab4-d84e-50ca-bc18-a2a68fe67c0f
+
+	measure Orders = SUM ( Sales[Orders] )
+		formatString: #,0
+		displayFolder: 1 Sales
+		lineageTag: f140dbf6-85ea-5abe-a3d8-5b2954a120f9
+
+	measure 'Avg Ticket' = DIVIDE ( [Net Sales], [Orders] )
+		formatString: \$#,0.00
+		displayFolder: 1 Sales
+		lineageTag: b9480ea1-01b4-5c46-a665-57dd37a4cca4
+
+	measure 'Items per Order' = DIVIDE ( SUM ( Sales[Items] ), [Orders] )
+		formatString: 0.00
+		displayFolder: 1 Sales
+		lineageTag: eae716a3-668c-5fb1-bbb0-0a51b794e130
+
+	measure 'Orders per Day' = DIVIDE ( [Orders], DISTINCTCOUNT ( 'Date'[Date] ) )
+		formatString: #,0
+		displayFolder: 1 Sales
+		lineageTag: 4cfc71bf-f8b0-58aa-b51d-bdc0f91e5db5
+
+	measure 'Sales per Seat' = DIVIDE ( [Net Sales], SUM ( Branches[Seats] ) )
+		formatString: \$#,0
+		displayFolder: 1 Sales
+		lineageTag: 05403fbb-936f-5947-93ff-013ee70b769a
+
+	measure 'Food Cost' = SUM ( Sales[FoodCost] )
+		formatString: \$#,0
+		displayFolder: 2 Cost
+		lineageTag: ea91551d-f8d1-570b-a1de-5602e4382bde
+
+	measure 'Food Cost %' = DIVIDE ( [Food Cost], [Gross Sales] )
+		formatString: 0.0%
+		displayFolder: 2 Cost
+		lineageTag: 789bb7e8-d00d-5777-aa5d-2d701b63452a
+
+	measure 'Aggregator Commission' = VAR x = SUM ( Sales[Commission] ) RETURN IF ( x > 0, x )
+		formatString: \$#,0
+		displayFolder: 2 Cost
+		lineageTag: 06cc732f-8909-55fc-88fa-05935e51da08
+
+	/// Net sales after food cost and platform commission
+	measure Contribution = [Net Sales] - [Food Cost] - [Aggregator Commission]
+		formatString: \$#,0
+		displayFolder: 2 Cost
+		lineageTag: df2d8519-6e18-5ee7-98b6-79fa5890f6dc
+
+	measure 'Contribution %' = DIVIDE ( [Contribution], [Net Sales] )
+		formatString: 0.0%
+		displayFolder: 2 Cost
+		lineageTag: b4e2d7cc-cb89-5ccf-8e4b-7142752dd41d
+
+	/// Order-weighted kitchen preparation time
+	measure 'Avg Prep Minutes' = DIVIDE ( SUM ( Sales[PrepMinutesTotal] ), [Orders] )
+		formatString: 0.0
+		displayFolder: 3 Service
+		lineageTag: f663ce5d-9129-57f4-b9d5-36bbddbb69fd
+
+	measure 'Avg Rating' = DIVIDE ( SUM ( Sales[RatingPoints] ), SUM ( Sales[Ratings] ) )
+		formatString: 0.00
+		displayFolder: 3 Service
+		lineageTag: b4fc0156-a754-5d38-9636-35afefcc841e
+
+	measure 'Delivery Share %' = DIVIDE ( CALCULATE ( [Orders], Sales[OrderType] = "Delivery" ), [Orders] )
+		formatString: 0.0%
+		displayFolder: 3 Service
+		lineageTag: 9dd75e34-5856-5786-a673-29bc3ce64a8a
+
+	measure 'Net Sales YoY %' =
+			VAR yr = MAX ( 'Date'[Year] )
+			VAR cur = CALCULATE ( [Net Sales], 'Date'[Year] = yr )
+			VAR prev = CALCULATE ( [Net Sales], 'Date'[Year] = yr - 1 )
+			RETURN DIVIDE ( cur - prev, prev )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 4 Time intelligence
+		lineageTag: 2360f99a-321d-5e03-b92f-40e3a769b6db
+
+	measure 'Net Sales PY' = CALCULATE ( [Net Sales], SAMEPERIODLASTYEAR ( 'Date'[Date] ) )
+		formatString: \$#,0
+		displayFolder: 4 Time intelligence
+		lineageTag: abe86c9d-aca8-5b88-b181-08d4af64e25f
+
+	column Dummy
+		dataType: string
+		isHidden
+		lineageTag: 202e5d6e-c090-5ea9-acc2-c1e9e486a65e
+		summarizeBy: none
+		sourceColumn: Dummy
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Dummy = text], {})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table
+

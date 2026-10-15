@@ -1,0 +1,67 @@
+// Bank Loan Applications & Approvals - DAX measures (table _Measures)
+
+// [1 Funnel]
+Applications =
+    COUNTROWS ( Applications )
+
+// [1 Funnel]
+Approved =
+    CALCULATE ( [Applications], Applications[Status] = "Approved" )
+
+// [1 Funnel]
+Rejected =
+    CALCULATE ( [Applications], Applications[Status] = "Rejected" )
+
+// [1 Funnel]
+Approval Rate % =
+    DIVIDE ( [Approved], [Applications] )
+
+// [2 Volume]
+Requested Amount =
+    SUM ( Applications[RequestedAmount] )
+
+// [2 Volume]
+Approved Amount =
+    SUM ( Applications[ApprovedAmount] )
+
+// [2 Volume]
+Avg Ticket (approved) =
+    DIVIDE ( [Approved Amount], [Approved] )
+
+// [3 Pricing] Simple average of approved loans' annual rates
+Avg Interest Rate =
+    AVERAGE ( Applications[InterestRate] )
+
+// [3 Pricing] Amount-weighted interest rate
+Weighted Avg Rate =
+    DIVIDE ( SUMX ( Applications, Applications[ApprovedAmount] * Applications[InterestRate] ), [Approved Amount] )
+
+// [4 Operations]
+Avg Processing Days =
+    AVERAGE ( Applications[ProcessingDays] )
+
+// [4 Operations]
+Within SLA % =
+    DIVIDE ( SUM ( Applications[WithinSLA] ), [Applications] )
+
+// [4 Operations]
+Docs Rejection Share % =
+    DIVIDE ( CALCULATE ( [Rejected], Applications[RejectionReason] = "Incomplete documents" ), [Rejected] )
+
+// [5 Time intelligence]
+Applications YoY % =
+    VAR yr = MAX ( 'Date'[Year] )
+VAR cur = CALCULATE ( [Applications], 'Date'[Year] = yr )
+VAR prev = CALCULATE ( [Applications], 'Date'[Year] = yr - 1 )
+RETURN DIVIDE ( cur - prev, prev )
+
+// [5 Time intelligence]
+Approved Amount YoY % =
+    VAR yr = MAX ( 'Date'[Year] )
+VAR cur = CALCULATE ( [Approved Amount], 'Date'[Year] = yr )
+VAR prev = CALCULATE ( [Approved Amount], 'Date'[Year] = yr - 1 )
+RETURN DIVIDE ( cur - prev, prev )
+
+// [5 Time intelligence]
+Approved Amount YTD =
+    TOTALYTD ( [Approved Amount], 'Date'[Date] )

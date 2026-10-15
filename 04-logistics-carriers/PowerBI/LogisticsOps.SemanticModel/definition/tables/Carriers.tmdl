@@ -1,0 +1,39 @@
+table Carriers
+	lineageTag: 6e43a0c9-e062-533d-ad30-66faca8470a1
+
+	column Carrier
+		dataType: string
+		lineageTag: d8bf6669-4b3e-52ff-a8b4-06d88287d241
+		summarizeBy: none
+		sourceColumn: Carrier
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Carrier Type'
+		dataType: string
+		lineageTag: efb8aa7b-ab51-55e9-baf9-ee3dc18ba015
+		summarizeBy: none
+		sourceColumn: Carrier Type
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Contract Price Index'
+		dataType: double
+		lineageTag: de8e888e-8264-593e-8ec1-f849da0d6505
+		summarizeBy: sum
+		sourceColumn: Contract Price Index
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Carriers = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "carriers.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"Carrier", type text}, {"Carrier Type", type text}, {"Contract Price Index", type number}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

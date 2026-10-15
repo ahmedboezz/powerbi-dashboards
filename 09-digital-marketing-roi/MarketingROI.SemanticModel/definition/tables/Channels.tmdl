@@ -1,0 +1,40 @@
+table Channels
+	lineageTag: 7348f0f8-adc8-574f-93e0-c7eced467e59
+
+	column Channel
+		dataType: string
+		lineageTag: b912a972-fc62-5ec5-9c8c-bc46d8adc22a
+		summarizeBy: none
+		sourceColumn: Channel
+
+		annotation SummarizationSetBy = Automatic
+
+	column Platform
+		dataType: string
+		lineageTag: 03c8c632-3853-581d-8184-f6d63316db59
+		summarizeBy: none
+		sourceColumn: Platform
+
+		annotation SummarizationSetBy = Automatic
+
+	column ChannelType
+		dataType: string
+		lineageTag: 437024f5-8a27-5762-a179-2f42a3ca16be
+		summarizeBy: none
+		sourceColumn: ChannelType
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Channels = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "channels.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+
+				    Organic = Table.InsertRows(Promoted, Table.RowCount(Promoted), {[Channel = "Organic & Direct", Platform = "Website", ChannelType = "Organic"]}),
+				    Result = Organic
+				in
+				    Result
+
+	annotation PBI_ResultType = Table

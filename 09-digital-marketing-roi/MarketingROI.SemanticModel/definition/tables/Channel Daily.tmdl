@@ -1,0 +1,78 @@
+/// Spend and revenue per channel per day
+table 'Channel Daily'
+	lineageTag: 96113661-5285-51ab-91bb-8573d57e46e9
+
+	column Date
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: aac79063-8109-5ca0-8b2f-1d7a71817c6a
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Channel
+		dataType: string
+		lineageTag: a88483b5-07ac-55c5-808e-857ad68a78a8
+		summarizeBy: none
+		sourceColumn: Channel
+
+		annotation SummarizationSetBy = Automatic
+
+	column Spend
+		dataType: double
+		formatString: #,0
+		lineageTag: 406388d3-16f2-5141-8758-8142a31f58cb
+		summarizeBy: sum
+		sourceColumn: Spend
+
+		annotation SummarizationSetBy = Automatic
+
+	column Revenue
+		dataType: double
+		formatString: #,0
+		lineageTag: 959536f0-3a55-563c-9779-5774d6be6dfc
+		summarizeBy: sum
+		sourceColumn: Revenue
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Daily Spend Band'
+		dataType: string
+		lineageTag: 34d4954b-2421-5131-ab74-9a5b7c51cc46
+		summarizeBy: none
+		sourceColumn: Daily Spend Band
+		sortByColumn: 'Band Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Band Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 05566c63-6b91-5375-95b5-caf6ebe901d0
+		summarizeBy: none
+		sourceColumn: Band Order
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Channel Daily' = m
+		mode: import
+		source =
+				let
+				    // daily spend per channel, to study diminishing returns
+				    Ads = Table.NestedJoin(#"Ad Performance", {"CampaignID"}, Campaigns, {"CampaignID"}, "C", JoinKind.Inner),
+				    WithCh = Table.ExpandTableColumn(Ads, "C", {"Channel"}),
+				    Grouped = Table.Group(WithCh, {"Date", "Channel"}, {{"Spend", each List.Sum([Spend]), type number}, {"Revenue", each List.Sum([Revenue]), type number}}),
+				    // spend level relative to the channel's own average day
+				    Avg = Table.Group(Grouped, {"Channel"}, {{"AvgSpend", each List.Average([Spend]), type number}}),
+				    WithAvg = Table.ExpandTableColumn(Table.NestedJoin(Grouped, {"Channel"}, Avg, {"Channel"}, "A", JoinKind.LeftOuter), "A", {"AvgSpend"}),
+				    Band = Table.AddColumn(WithAvg, "Daily Spend Band", each let x = [Spend] / [AvgSpend] in
+				             if x < 0.75 then "< 0.75x avg" else if x < 1.25 then "0.75-1.25x avg" else if x < 2 then "1.25-2x avg" else "2x+ avg", type text),
+				    BandOrd = Table.AddColumn(Band, "Band Order", each List.PositionOf({"< 0.75x avg", "0.75-1.25x avg", "1.25-2x avg", "2x+ avg"}, [Daily Spend Band]), Int64.Type)
+				in
+				    BandOrd
+
+	annotation PBI_ResultType = Table

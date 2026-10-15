@@ -1,0 +1,56 @@
+// HR Workforce & Attrition Analysis - DAX measures (table _Measures)
+
+// [1 Headcount]
+Employees =
+    COUNTROWS ( Employees )
+
+// [1 Headcount]
+Active Headcount =
+    CALCULATE ( [Employees], Employees[Status] = "Active" )
+
+// [2 Attrition] Leavers regardless of the exit-date filter
+Leavers =
+    CALCULATE ( SUM ( Employees[Left] ), CROSSFILTER ( Employees[ExitDate], 'Date'[Date], NONE ) )
+
+// [2 Attrition] Leavers by exit date (use with the Date table)
+Exits =
+    VAR x = SUM ( Employees[Left] ) RETURN IF ( x > 0, x )
+
+// [2 Attrition]
+Attrition Rate % =
+    DIVIDE ( [Leavers], [Employees] )
+
+// [2 Attrition]
+Overtime Attrition % =
+    CALCULATE ( [Attrition Rate %], Employees[Overtime] = "Yes" )
+
+// [2 Attrition]
+No-Overtime Attrition % =
+    CALCULATE ( [Attrition Rate %], Employees[Overtime] = "No" )
+
+// [2 Attrition]
+First-Year Attrition % =
+    CALCULATE ( [Attrition Rate %], Employees[TenureBand] = "0-1 yr" )
+
+// [2 Attrition]
+Exits YoY % =
+    VAR yr = MAX ( 'Date'[Year] )
+VAR cur = CALCULATE ( [Exits], 'Date'[Year] = yr )
+VAR prev = CALCULATE ( [Exits], 'Date'[Year] = yr - 1 )
+RETURN DIVIDE ( cur - prev, prev )
+
+// [3 Pay & engagement]
+Avg Monthly Salary =
+    AVERAGE ( Employees[MonthlySalary] )
+
+// [3 Pay & engagement]
+Avg Satisfaction =
+    AVERAGE ( Employees[Satisfaction] )
+
+// [3 Pay & engagement]
+Avg Tenure (yrs) =
+    AVERAGE ( Employees[TenureYears] )
+
+// [3 Pay & engagement] Assumes replacing an employee costs 6 months of salary
+Replacement Cost =
+    SUMX ( FILTER ( Employees, Employees[Status] = "Left" ), Employees[MonthlySalary] * 6 )

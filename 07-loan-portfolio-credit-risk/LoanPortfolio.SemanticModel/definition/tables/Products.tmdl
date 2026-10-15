@@ -1,0 +1,45 @@
+table Products
+	lineageTag: e666eed4-17a8-58ed-b159-d8823102d9ce
+
+	column ProductCode
+		dataType: string
+		lineageTag: 2ac58633-cb84-57ba-8156-73d51c1e982b
+		summarizeBy: none
+		sourceColumn: ProductCode
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductName
+		dataType: string
+		lineageTag: 019ede16-53ff-5627-b4be-ddf7f63860bc
+		summarizeBy: none
+		sourceColumn: ProductName
+
+		annotation SummarizationSetBy = Automatic
+
+	column Segment
+		dataType: string
+		lineageTag: 281f17d3-653f-5c5e-a09c-1ccf984b7d21
+		summarizeBy: none
+		sourceColumn: Segment
+
+		annotation SummarizationSetBy = Automatic
+
+	column Collateral
+		dataType: string
+		lineageTag: 46f910dd-0d4f-5900-97f1-03d22f3aa717
+		summarizeBy: none
+		sourceColumn: Collateral
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Products = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "products.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true])
+				in
+				    Promoted
+
+	annotation PBI_ResultType = Table

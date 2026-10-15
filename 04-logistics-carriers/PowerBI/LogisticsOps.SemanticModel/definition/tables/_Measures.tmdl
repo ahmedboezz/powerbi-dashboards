@@ -1,0 +1,106 @@
+table _Measures
+	lineageTag: b91f61c3-2ce2-5851-a164-812972f2a7d4
+
+	measure Shipments = COUNTROWS ( Shipments )
+		formatString: #,0
+		displayFolder: 1 Volume
+		lineageTag: 53770f8d-b2c6-5df5-8f06-b030155f1858
+
+	measure 'Total Weight (kg)' = SUM ( Shipments[WeightKg] )
+		formatString: #,0
+		displayFolder: 1 Volume
+		lineageTag: a2c418f1-094b-5b7c-9d76-2b044050b1f5
+
+	measure 'On-Time Shipments' = SUM ( Shipments[OnTime] )
+		formatString: #,0
+		displayFolder: 2 Service
+		lineageTag: ef3ce09c-1bce-58be-87d3-f731f9d2f896
+
+	measure 'On-Time %' = DIVIDE ( [On-Time Shipments], [Shipments] )
+		formatString: 0.0%
+		displayFolder: 2 Service
+		lineageTag: 9d4b6eef-a544-56dd-8849-1a756618b2a4
+
+	measure 'Late Shipments' = [Shipments] - [On-Time Shipments]
+		formatString: #,0
+		displayFolder: 2 Service
+		lineageTag: cc794b8b-aae7-5615-b545-65a0a88d89ae
+
+	measure 'Avg Delay (late only)' = AVERAGEX ( FILTER ( Shipments, Shipments[DelayDays] > 0 ), Shipments[DelayDays] )
+		formatString: 0.0
+		displayFolder: 2 Service
+		lineageTag: 6a2a931e-3dcb-50d0-acbc-98591315db5e
+
+	measure 'Avg Transit Days' = AVERAGE ( Shipments[ActualDays] )
+		formatString: 0.0
+		displayFolder: 2 Service
+		lineageTag: 112998e3-0478-5319-83e6-7bbaeaf9598a
+
+	measure 'Damage Rate %' = DIVIDE ( SUM ( Shipments[Damaged] ), [Shipments] )
+		formatString: 0.00%
+		displayFolder: 2 Service
+		lineageTag: 572944e8-f705-5c88-b4c9-0dec8f48ec9e
+
+	measure 'Freight Cost' = SUM ( Shipments[ShippingCost] )
+		formatString: \$#,0
+		displayFolder: 3 Cost
+		lineageTag: 9156b893-77a2-5c0a-b601-0ea72823fe3e
+
+	measure 'Cost per Shipment' = DIVIDE ( [Freight Cost], [Shipments] )
+		formatString: \$#,0.00
+		displayFolder: 3 Cost
+		lineageTag: 7604639d-6d46-5a02-83ce-6f4047e18e0d
+
+	measure 'Cost per Kg' = DIVIDE ( [Freight Cost], [Total Weight (kg)] )
+		formatString: \$#,0.00
+		displayFolder: 3 Cost
+		lineageTag: ff7faa6a-23a4-5203-a076-d2a2672d70af
+
+	measure 'Cost of Late Shipments' = CALCULATE ( [Freight Cost], Shipments[OnTime] = 0 )
+		formatString: \$#,0
+		displayFolder: 3 Cost
+		lineageTag: f0cd3d7e-671b-54b5-bc3d-a9717c70f0ac
+
+	measure 'Shipments YoY %' =
+			VAR yr = MAX ( 'Date'[Year] )
+			VAR cur = CALCULATE ( [Shipments], 'Date'[Year] = yr )
+			VAR prev = CALCULATE ( [Shipments], 'Date'[Year] = yr - 1 )
+			RETURN DIVIDE ( cur - prev, prev )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 4 Time intelligence
+		lineageTag: 62da6702-c1fa-5cb9-8d81-4c44852cd707
+
+	measure 'On-Time % PY' = CALCULATE ( [On-Time %], SAMEPERIODLASTYEAR ( 'Date'[Date] ) )
+		formatString: 0.0%
+		displayFolder: 4 Time intelligence
+		lineageTag: a3b8d912-22be-5d09-ae87-37b6f6651da7
+
+	/// Weighted 0-100 score: 70% on-time, 15% damage, 15% relative cost
+	measure 'Carrier Score' =
+			VAR otd = [On-Time %]
+			VAR dmg = [Damage Rate %]
+			VAR cpk = DIVIDE ( [Cost per Kg], CALCULATE ( [Cost per Kg], ALL ( Carriers ) ) )
+			RETURN ROUND ( otd * 70 + ( 1 - dmg * 20 ) * 15 + ( 2 - cpk ) * 15, 1 )
+		formatString: 0.0
+		displayFolder: 5 Scorecard
+		lineageTag: 073d2dc5-cd62-52fa-ae4a-b59a37671f16
+
+	column Dummy
+		dataType: string
+		isHidden
+		lineageTag: 202e5d6e-c090-5ea9-acc2-c1e9e486a65e
+		summarizeBy: none
+		sourceColumn: Dummy
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Dummy = text], {})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table
+

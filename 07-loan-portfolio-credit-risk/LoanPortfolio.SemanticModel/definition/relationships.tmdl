@@ -1,0 +1,31 @@
+relationship c3594c80-d19d-5808-9378-d010b9582284
+	fromColumn: Performance.LoanID
+	toColumn: Loans.LoanID
+
+relationship 41695acc-2def-5da1-afed-c15946c6cd5b
+	fromColumn: Loans.CustomerID
+	toColumn: Customers.CustomerID
+
+relationship 85e0a1ca-f366-50a8-bc77-31d81a33ffa1
+	fromColumn: Loans.ProductCode
+	toColumn: Products.ProductCode
+
+relationship 90ca89ec-4167-5670-a4d3-a4fcf0001732
+	fromColumn: Loans.BranchCode
+	toColumn: Branches.BranchCode
+
+relationship 26e20b47-ecc9-543c-a2e3-3c97d68cf6bf
+	fromColumn: Performance.SnapshotDate
+	toColumn: Date.Date
+
+relationship 33147b35-e76d-5324-b708-891bc2f0f637
+	fromColumn: Performance.Bucket
+	toColumn: Bucket.Bucket
+
+relationship c5bee481-4e34-5573-97c1-f32ec1ae12a5
+	fromColumn: Performance.PrevBucket
+	toColumn: 'Prev Bucket'.'Prev Bucket'
+
+relationship 0f99a100-798e-5090-ae50-272975441de3
+	fromColumn: Performance.Stage
+	toColumn: Stages.Stage

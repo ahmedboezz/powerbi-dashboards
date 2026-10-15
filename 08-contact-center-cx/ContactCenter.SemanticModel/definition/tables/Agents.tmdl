@@ -1,0 +1,73 @@
+table Agents
+	lineageTag: e9b780fd-0f94-511e-a279-bdd57e7d1700
+
+	column AgentID
+		dataType: string
+		lineageTag: fe327df2-a71d-5c80-955a-39113c1ded46
+		summarizeBy: none
+		sourceColumn: AgentID
+
+		annotation SummarizationSetBy = Automatic
+
+	column AgentName
+		dataType: string
+		lineageTag: 6663502e-9400-55ac-9fdb-35c5fb41136d
+		summarizeBy: none
+		sourceColumn: AgentName
+
+		annotation SummarizationSetBy = Automatic
+
+	column Team
+		dataType: string
+		lineageTag: 9674c70c-54c6-5732-98d1-049919e0cf2e
+		summarizeBy: none
+		sourceColumn: Team
+
+		annotation SummarizationSetBy = Automatic
+
+	column Supervisor
+		dataType: string
+		lineageTag: 54cea5ed-e9e8-5192-b33b-33eee4d3e09d
+		summarizeBy: none
+		sourceColumn: Supervisor
+
+		annotation SummarizationSetBy = Automatic
+
+	column HireDate
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: b1a2a16b-862a-5b9e-a232-b530f787349b
+		summarizeBy: none
+		sourceColumn: HireDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Language
+		dataType: string
+		lineageTag: 88e990a0-3c3c-5e68-9ff6-f442ea651f2b
+		summarizeBy: none
+		sourceColumn: Language
+
+		annotation SummarizationSetBy = Automatic
+
+	column Gender
+		dataType: string
+		lineageTag: 89fe1299-a575-50bb-b876-2aa116faac98
+		summarizeBy: none
+		sourceColumn: Gender
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Agents = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "agents.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Result = Table.TransformColumnTypes(Promoted, {{"HireDate", type date}}, "en-US")
+				in
+				    Result
+
+	annotation PBI_ResultType = Table

@@ -1,0 +1,126 @@
+table _Measures
+	lineageTag: b91f61c3-2ce2-5851-a164-812972f2a7d4
+
+	measure 'Fleet Size' = COUNTROWS ( Vehicles )
+		formatString: #,0
+		displayFolder: 1 Fleet
+		lineageTag: b4d42b87-ba84-50b3-80c3-db6794823dd7
+
+	measure 'Vehicle Days Worked' = COUNTROWS ( Trips )
+		formatString: #,0
+		displayFolder: 1 Fleet
+		lineageTag: b9146185-ea4d-5665-b332-774f94785660
+
+	/// Days a vehicle worked / vehicle-days in the period
+	measure 'Utilization %' = DIVIDE ( [Vehicle Days Worked], [Fleet Size] * COUNTROWS ( 'Date' ) )
+		formatString: 0.0%
+		displayFolder: 1 Fleet
+		lineageTag: 16c931a3-ac7d-5fb1-922c-52e9c58171aa
+
+	measure 'Downtime Hours' = SUM ( 'Work Orders'[DowntimeHours] )
+		formatString: #,0
+		displayFolder: 1 Fleet
+		lineageTag: 9c41e413-b889-54aa-8aa7-4087f3c5fd16
+
+	/// 1 - workshop downtime hours / calendar hours (open work orders excluded)
+	measure 'Availability %' = 1 - DIVIDE ( [Downtime Hours], [Fleet Size] * COUNTROWS ( 'Date' ) * 24 )
+		formatString: 0.0%
+		displayFolder: 1 Fleet
+		lineageTag: def9eae1-3291-5d8d-8875-de9642b92f31
+
+	measure 'Total Km' = SUM ( Trips[Km] )
+		formatString: #,0
+		displayFolder: 2 Operations
+		lineageTag: ba6006c0-2091-5566-8310-a047db2ba798
+
+	measure Deliveries = SUM ( Trips[Deliveries] )
+		formatString: #,0
+		displayFolder: 2 Operations
+		lineageTag: eb408394-506a-576a-be79-09af92979285
+
+	measure 'Fuel Liters' = SUM ( Trips[FuelLiters] )
+		formatString: #,0
+		displayFolder: 3 Fuel
+		lineageTag: 0c005319-6107-54eb-b8a5-09cb135d83ed
+
+	measure 'Fuel Cost' = SUM ( Trips[FuelCost] )
+		formatString: #,0
+		displayFolder: 3 Fuel
+		lineageTag: 951e1295-30b9-5c24-8da5-5abfdeec4a83
+
+	measure 'L per 100 km' = DIVIDE ( [Fuel Liters], [Total Km] ) * 100
+		formatString: 0.0
+		displayFolder: 3 Fuel
+		lineageTag: aa1c2854-1125-5781-b69e-aba5b9613c8f
+
+	/// Idle minutes / 10-hour shift minutes
+	measure 'Idle %' = DIVIDE ( SUM ( Trips[IdleMinutes] ), [Vehicle Days Worked] * 600 )
+		formatString: 0.0%
+		displayFolder: 3 Fuel
+		lineageTag: 9eee9ab5-e8f4-5179-9a9a-672b08ec39f2
+
+	measure 'Maintenance Cost' = SUM ( 'Work Orders'[TotalCost] )
+		formatString: #,0
+		displayFolder: 4 Maintenance
+		lineageTag: 0a1aa714-cf5c-545e-81d6-d34c1212b2e4
+
+	measure 'Work Orders' = COUNTROWS ( 'Work Orders' )
+		formatString: #,0
+		displayFolder: 4 Maintenance
+		lineageTag: 68f614c8-914d-5d3c-b0c7-d7069b5d4157
+
+	measure 'Corrective WOs' = CALCULATE ( [Work Orders], 'Work Orders'[WorkType] = "Corrective" )
+		formatString: #,0
+		displayFolder: 4 Maintenance
+		lineageTag: 18459066-6a5b-575f-935d-a340c1f9f080
+
+	/// Planned / (planned + unplanned) work orders
+	measure 'Preventive Share %' =
+			DIVIDE (
+			    CALCULATE ( [Work Orders], 'Work Orders'[WorkType] = "Preventive" ),
+			    CALCULATE ( [Work Orders], 'Work Orders'[WorkType] IN { "Preventive", "Corrective" } )
+			)
+		formatString: 0.0%
+		displayFolder: 4 Maintenance
+		lineageTag: d2844dfc-41d8-524a-8dbe-8a7235b75b23
+
+	/// Distance between failures (MDBF)
+	measure 'Km per Breakdown' = DIVIDE ( [Total Km], [Corrective WOs] )
+		formatString: #,0
+		displayFolder: 4 Maintenance
+		lineageTag: 8da9d8d1-90aa-5c35-a97c-963a541a9532
+
+	measure 'Maintenance Cost per Km' = DIVIDE ( [Maintenance Cost], [Total Km] )
+		formatString: 0.00
+		displayFolder: 5 Cost
+		lineageTag: c771aaf5-c6bf-5b05-bada-49d98ccc59da
+
+	/// Fuel + maintenance per km (SAR)
+	measure 'Cost per Km' = DIVIDE ( [Fuel Cost] + [Maintenance Cost], [Total Km] )
+		formatString: 0.00
+		displayFolder: 5 Cost
+		lineageTag: 6748b2b9-6295-5d90-b87f-95bf32506bf4
+
+	measure 'Cost per Delivery' = DIVIDE ( [Fuel Cost] + [Maintenance Cost], [Deliveries] )
+		formatString: 0.00
+		displayFolder: 5 Cost
+		lineageTag: faadb989-6f18-53ed-a542-e48ef8619cd5
+
+	column Dummy
+		dataType: string
+		isHidden
+		lineageTag: 202e5d6e-c090-5ea9-acc2-c1e9e486a65e
+		summarizeBy: none
+		sourceColumn: Dummy
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Dummy = text], {})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table

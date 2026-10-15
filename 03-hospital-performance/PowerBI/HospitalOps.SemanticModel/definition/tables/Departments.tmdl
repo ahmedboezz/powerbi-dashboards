@@ -1,0 +1,39 @@
+table Departments
+	lineageTag: ee5f6752-91f0-5813-a16b-0c1423c2da00
+
+	column Department
+		dataType: string
+		lineageTag: 02469353-26ca-599f-814b-8d419a310d7f
+		summarizeBy: none
+		sourceColumn: Department
+
+		annotation SummarizationSetBy = Automatic
+
+	column Beds
+		dataType: int64
+		lineageTag: 1bafe882-8ff8-51dd-b323-17d454a76a6e
+		summarizeBy: sum
+		sourceColumn: Beds
+
+		annotation SummarizationSetBy = Automatic
+
+	column Division
+		dataType: string
+		lineageTag: 30b597b3-9c80-56d2-bb44-e5aab89d0962
+		summarizeBy: none
+		sourceColumn: Division
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Departments = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "departments.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"Department", type text}, {"Beds", Int64.Type}, {"Division", type text}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

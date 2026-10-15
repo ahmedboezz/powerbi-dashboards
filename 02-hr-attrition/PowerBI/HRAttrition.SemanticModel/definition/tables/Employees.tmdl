@@ -1,0 +1,189 @@
+table Employees
+	lineageTag: 10a06891-6627-58ca-8ad5-ba6ae80a6a69
+
+	column EmployeeID
+		dataType: string
+		lineageTag: 441daa42-e903-52d6-9c52-f975568174f0
+		summarizeBy: none
+		sourceColumn: EmployeeID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Department
+		dataType: string
+		lineageTag: 3ab7f7e3-437d-5788-a018-0c3b18aea46a
+		summarizeBy: none
+		sourceColumn: Department
+
+		annotation SummarizationSetBy = Automatic
+
+	column JobLevel
+		dataType: string
+		lineageTag: 9728d1a4-4d97-5bbe-91e2-806158de4da9
+		summarizeBy: none
+		sourceColumn: JobLevel
+		sortByColumn: 'JobLevel Order'
+
+		annotation SummarizationSetBy = Automatic
+
+	column Gender
+		dataType: string
+		lineageTag: e0b70442-f417-5660-ba5a-8ebaef8318c4
+		summarizeBy: none
+		sourceColumn: Gender
+
+		annotation SummarizationSetBy = Automatic
+
+	column Age
+		dataType: int64
+		formatString: 0
+		lineageTag: 3e789ecd-cb54-5fb4-8cd3-39c914eb637c
+		summarizeBy: none
+		sourceColumn: Age
+
+		annotation SummarizationSetBy = Automatic
+
+	column AgeBand
+		dataType: string
+		lineageTag: fefa9b6b-6a85-5d19-94dd-5b737c760b0f
+		summarizeBy: none
+		sourceColumn: AgeBand
+
+		annotation SummarizationSetBy = Automatic
+
+	column WorkMode
+		dataType: string
+		lineageTag: 660f0773-d384-52ed-a254-d6a2b94f5683
+		summarizeBy: none
+		sourceColumn: WorkMode
+
+		annotation SummarizationSetBy = Automatic
+
+	column HireDate
+		dataType: dateTime
+		formatString: dd mmm yyyy
+		lineageTag: 676dbd46-7d1b-56e0-bac5-a4ea6fcee35c
+		summarizeBy: none
+		sourceColumn: HireDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column TenureYears
+		dataType: double
+		formatString: 0.0
+		lineageTag: cf41ab5b-5ae1-55db-bbbc-b7e711bad0bf
+		summarizeBy: sum
+		sourceColumn: TenureYears
+
+		annotation SummarizationSetBy = Automatic
+
+	column TenureBand
+		dataType: string
+		lineageTag: c3fcfa75-0c20-5f40-9379-1af1f02b8872
+		summarizeBy: none
+		sourceColumn: TenureBand
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthlySalary
+		dataType: double
+		formatString: \$#,0
+		lineageTag: 27d7de85-4da0-5a66-8100-e10a19d70965
+		summarizeBy: sum
+		sourceColumn: MonthlySalary
+
+		annotation SummarizationSetBy = Automatic
+
+	column Overtime
+		dataType: string
+		lineageTag: 20afdbf9-4799-560f-924a-a52eb0dc9813
+		summarizeBy: none
+		sourceColumn: Overtime
+
+		annotation SummarizationSetBy = Automatic
+
+	column Satisfaction
+		dataType: int64
+		formatString: 0
+		lineageTag: 06c4abea-5d8e-5e0a-a645-37b42ed8c8e4
+		summarizeBy: none
+		sourceColumn: Satisfaction
+
+		annotation SummarizationSetBy = Automatic
+
+	column PerformanceRating
+		dataType: int64
+		formatString: 0
+		lineageTag: 2e158989-2339-58d9-852d-7e74ce4d4205
+		summarizeBy: none
+		sourceColumn: PerformanceRating
+
+		annotation SummarizationSetBy = Automatic
+
+	column TrainingHours
+		dataType: int64
+		lineageTag: 5d11b8e9-2aeb-5621-8935-8adf0b193c75
+		summarizeBy: sum
+		sourceColumn: TrainingHours
+
+		annotation SummarizationSetBy = Automatic
+
+	column Status
+		dataType: string
+		lineageTag: 83de7f53-3c72-5392-8b94-d9f24433a32a
+		summarizeBy: none
+		sourceColumn: Status
+
+		annotation SummarizationSetBy = Automatic
+
+	column ExitDate
+		dataType: dateTime
+		formatString: dd mmm yyyy
+		lineageTag: b10be60d-9958-5c30-a10e-5bbdebfcbc46
+		summarizeBy: none
+		sourceColumn: ExitDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column ExitReason
+		dataType: string
+		lineageTag: cccec40c-9ede-55cf-8d5d-c1516ffceac2
+		summarizeBy: none
+		sourceColumn: ExitReason
+
+		annotation SummarizationSetBy = Automatic
+
+	column Left
+		dataType: int64
+		lineageTag: 22266a2c-dcec-51ba-bb61-1b8f75aceef9
+		summarizeBy: sum
+		sourceColumn: Left
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'JobLevel Order'
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 1a9b7a28-3b0b-5c96-8394-e1bcb776ab9b
+		summarizeBy: none
+		sourceColumn: JobLevel Order
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Employees = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "employees.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"EmployeeID", type text}, {"Department", type text}, {"JobLevel", type text}, {"Gender", type text}, {"Age", Int64.Type}, {"AgeBand", type text}, {"WorkMode", type text}, {"HireDate", type date}, {"TenureYears", type number}, {"TenureBand", type text}, {"MonthlySalary", type number}, {"Overtime", type text}, {"Satisfaction", Int64.Type}, {"PerformanceRating", Int64.Type}, {"TrainingHours", Int64.Type}, {"Status", type text}, {"ExitDate", type date}, {"ExitReason", type text}, {"Left", Int64.Type}, {"JobLevel Order", Int64.Type}}, "en-US")
+				in
+				    Typed
+
+	annotation PBI_ResultType = Table
+

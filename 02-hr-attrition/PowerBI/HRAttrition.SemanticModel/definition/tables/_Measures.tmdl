@@ -1,0 +1,94 @@
+table _Measures
+	lineageTag: b91f61c3-2ce2-5851-a164-812972f2a7d4
+
+	measure Employees = COUNTROWS ( Employees )
+		formatString: #,0
+		displayFolder: 1 Headcount
+		lineageTag: ed8c8410-8c61-5e1d-b3e5-de22427f7409
+
+	measure 'Active Headcount' = CALCULATE ( [Employees], Employees[Status] = "Active" )
+		formatString: #,0
+		displayFolder: 1 Headcount
+		lineageTag: 1f74c42a-0200-5236-a2a7-241adcdbc0d6
+
+	/// Leavers regardless of the exit-date filter
+	measure Leavers = CALCULATE ( SUM ( Employees[Left] ), CROSSFILTER ( Employees[ExitDate], 'Date'[Date], NONE ) )
+		formatString: #,0
+		displayFolder: 2 Attrition
+		lineageTag: 63a94da5-993c-5f7e-b474-7e10620b199b
+
+	/// Leavers by exit date (use with the Date table)
+	measure Exits = VAR x = SUM ( Employees[Left] ) RETURN IF ( x > 0, x )
+		formatString: #,0
+		displayFolder: 2 Attrition
+		lineageTag: 66e3fc2c-cadb-5460-b493-951427280d89
+
+	measure 'Attrition Rate %' = DIVIDE ( [Leavers], [Employees] )
+		formatString: 0.0%
+		displayFolder: 2 Attrition
+		lineageTag: 98044404-01f1-52d0-b4aa-234309d3972f
+
+	measure 'Overtime Attrition %' = CALCULATE ( [Attrition Rate %], Employees[Overtime] = "Yes" )
+		formatString: 0.0%
+		displayFolder: 2 Attrition
+		lineageTag: 4ba06350-daa4-529b-a034-fda1ee2ff8dc
+
+	measure 'No-Overtime Attrition %' = CALCULATE ( [Attrition Rate %], Employees[Overtime] = "No" )
+		formatString: 0.0%
+		displayFolder: 2 Attrition
+		lineageTag: ad75182a-4724-5f8b-b857-16e793d95e71
+
+	measure 'First-Year Attrition %' = CALCULATE ( [Attrition Rate %], Employees[TenureBand] = "0-1 yr" )
+		formatString: 0.0%
+		displayFolder: 2 Attrition
+		lineageTag: e3d26123-5a71-54ef-8282-0842b4c0be00
+
+	measure 'Exits YoY %' =
+			VAR yr = MAX ( 'Date'[Year] )
+			VAR cur = CALCULATE ( [Exits], 'Date'[Year] = yr )
+			VAR prev = CALCULATE ( [Exits], 'Date'[Year] = yr - 1 )
+			RETURN DIVIDE ( cur - prev, prev )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 2 Attrition
+		lineageTag: 0632a541-4aad-5225-863e-979fcab24326
+
+	measure 'Avg Monthly Salary' = AVERAGE ( Employees[MonthlySalary] )
+		formatString: \$#,0
+		displayFolder: 3 Pay & engagement
+		lineageTag: be9bbf23-75bc-5b6f-a826-0a2a92106b98
+
+	measure 'Avg Satisfaction' = AVERAGE ( Employees[Satisfaction] )
+		formatString: 0.00
+		displayFolder: 3 Pay & engagement
+		lineageTag: 856432e0-14af-5213-bc93-898ad06fe2f0
+
+	measure 'Avg Tenure (yrs)' = AVERAGE ( Employees[TenureYears] )
+		formatString: 0.0
+		displayFolder: 3 Pay & engagement
+		lineageTag: 56a0e480-82d4-5291-ab7b-2ec57944fc18
+
+	/// Assumes replacing an employee costs 6 months of salary
+	measure 'Replacement Cost' = SUMX ( FILTER ( Employees, Employees[Status] = "Left" ), Employees[MonthlySalary] * 6 )
+		formatString: \$#,0
+		displayFolder: 3 Pay & engagement
+		lineageTag: a6bbae49-eb85-514e-b34f-da8082e5d2f1
+
+	column Dummy
+		dataType: string
+		isHidden
+		lineageTag: 202e5d6e-c090-5ea9-acc2-c1e9e486a65e
+		summarizeBy: none
+		sourceColumn: Dummy
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Dummy = text], {})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table
+

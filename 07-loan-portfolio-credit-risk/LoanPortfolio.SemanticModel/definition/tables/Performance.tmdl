@@ -1,0 +1,139 @@
+/// Month-end performance snapshot per loan
+table Performance
+	lineageTag: f7814b6a-2676-58be-9138-00a4b1beb723
+
+	column SnapshotDate
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 351d04d1-d953-5a79-8d2d-ca2a85c0d03c
+		summarizeBy: none
+		sourceColumn: SnapshotDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column LoanID
+		dataType: string
+		lineageTag: 929417f4-266a-5a98-a84d-af34ce21b76c
+		summarizeBy: none
+		sourceColumn: LoanID
+
+		annotation SummarizationSetBy = Automatic
+
+	column MOB
+		dataType: int64
+		formatString: 0
+		lineageTag: 428c597d-2120-5890-8f66-76e6c3df55e9
+		summarizeBy: none
+		sourceColumn: MOB
+
+		annotation SummarizationSetBy = Automatic
+
+	column OutstandingPrincipal
+		dataType: double
+		formatString: #,0
+		lineageTag: a909c4f6-3be7-5e1e-b8e1-d7a72ea1534c
+		summarizeBy: sum
+		sourceColumn: OutstandingPrincipal
+
+		annotation SummarizationSetBy = Automatic
+
+	column DPD
+		dataType: int64
+		formatString: 0
+		lineageTag: 24a296ea-737d-50b2-8fa4-af6595293cc9
+		summarizeBy: none
+		sourceColumn: DPD
+
+		annotation SummarizationSetBy = Automatic
+
+	column AmountDue
+		dataType: double
+		formatString: #,0
+		lineageTag: 0fef2528-add8-5b43-b4d7-65f7a14db9b7
+		summarizeBy: sum
+		sourceColumn: AmountDue
+
+		annotation SummarizationSetBy = Automatic
+
+	column AmountCollected
+		dataType: double
+		formatString: #,0
+		lineageTag: b0b533bd-d71d-57c2-84b4-120bc5033a6b
+		summarizeBy: sum
+		sourceColumn: AmountCollected
+
+		annotation SummarizationSetBy = Automatic
+
+	column WriteOffAmount
+		dataType: double
+		formatString: #,0
+		lineageTag: 952f23a5-40ae-522d-b601-808df88ebd8b
+		summarizeBy: sum
+		sourceColumn: WriteOffAmount
+
+		annotation SummarizationSetBy = Automatic
+
+	column Bucket
+		dataType: string
+		lineageTag: 098e41d5-571c-5c0b-8abc-dcf4e8a0f2ba
+		summarizeBy: none
+		sourceColumn: Bucket
+
+		annotation SummarizationSetBy = Automatic
+
+	column Stage
+		dataType: string
+		lineageTag: ba1a3244-9b56-550d-9ed1-6680d648210d
+		summarizeBy: none
+		sourceColumn: Stage
+
+		annotation SummarizationSetBy = Automatic
+
+	column PrevBucket
+		dataType: string
+		lineageTag: 59580be5-cc75-5b6d-9c7a-fc4b10d0da0a
+		summarizeBy: none
+		sourceColumn: PrevBucket
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Performance = m
+		mode: import
+		source =
+				let
+				    Source = Folder.Files(DataFolder & "performance"),
+				    Csvs = Table.SelectRows(Source, each [Extension] = ".csv"),
+				    Data = Table.AddColumn(Csvs, "Data", each Table.PromoteHeaders(
+				             Csv.Document([Content], [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]), [PromoteAllScalars = true])),
+				    Combined = Table.Combine(Data[Data]),
+				    Typed = Table.TransformColumnTypes(Combined, {{"SnapshotDate", type date}, {"MOB", Int64.Type}, {"OutstandingPrincipal", type number},
+				              {"DPD", Int64.Type}, {"AmountDue", type number}, {"AmountCollected", type number}, {"WriteOffAmount", type number}}, "en-US"),
+				    // the June-2025 file was exported twice for some contracts
+				    Dedup = Table.Distinct(Typed, {"LoanID", "SnapshotDate"}),
+				    Bucket = Table.AddColumn(Dedup, "Bucket", each
+				               if [LoanStatus] = "Closed" then "Closed"
+				               else if [LoanStatus] = "Written-off" then "Written-off"
+				               else if [DPD] = 0 then "Current"
+				               else if [DPD] < 30 then "1-29"
+				               else if [DPD] < 60 then "30-59"
+				               else if [DPD] < 90 then "60-89"
+				               else "90+", type text),
+				    Stage = Table.AddColumn(Bucket, "Stage", each
+				               if List.Contains({"Current", "1-29"}, [Bucket]) then "Stage 1"
+				               else if List.Contains({"30-59", "60-89"}, [Bucket]) then "Stage 2"
+				               else if [Bucket] = "90+" then "Stage 3"
+				               else "Exited", type text),
+				    // previous month bucket of the same loan (self-merge) for roll-rate analysis
+				    Prev = Table.SelectColumns(Stage, {"LoanID", "SnapshotDate", "Bucket"}),
+				    PrevShift = Table.TransformColumns(Prev, {{"SnapshotDate", each Date.EndOfMonth(Date.AddMonths(_, 1)), type date}}),
+				    PrevRen = Table.RenameColumns(PrevShift, {{"Bucket", "PrevBucket"}}),
+				    Joined = Table.NestedJoin(Stage, {"LoanID", "SnapshotDate"}, PrevRen, {"LoanID", "SnapshotDate"}, "P", JoinKind.LeftOuter),
+				    Expanded = Table.ExpandTableColumn(Joined, "P", {"PrevBucket"}),
+				    NewLoans = Table.ReplaceValue(Expanded, null, "New", Replacer.ReplaceValue, {"PrevBucket"}),
+				    Result = Table.RemoveColumns(NewLoans, {"LoanStatus"})
+				in
+				    Result
+
+	annotation PBI_ResultType = Table

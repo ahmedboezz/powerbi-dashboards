@@ -1,0 +1,21 @@
+{
+  "name": "Contact Centre Theme",
+  "dataColors": [
+    "#1F4E79",
+    "#2E86C1",
+    "#F39C12",
+    "#C0392B",
+    "#27AE60",
+    "#8E44AD",
+    "#7F8C8D",
+    "#16A085",
+    "#D35400",
+    "#5D6D7E"
+  ],
+  "background": "#FFFFFF",
+  "foreground": "#1F2D3D",
+  "tableAccent": "#1F4E79",
+  "good": "#27AE60",
+  "neutral": "#F39C12",
+  "bad": "#C0392B"
+}

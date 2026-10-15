@@ -1,0 +1,107 @@
+table _Measures
+	lineageTag: b91f61c3-2ce2-5851-a164-812972f2a7d4
+
+	measure Applications = COUNTROWS ( Applications )
+		formatString: #,0
+		displayFolder: 1 Funnel
+		lineageTag: 97949487-8139-5787-8a27-82869cbf5afc
+
+	measure Approved = CALCULATE ( [Applications], Applications[Status] = "Approved" )
+		formatString: #,0
+		displayFolder: 1 Funnel
+		lineageTag: b066d2aa-e77b-5048-bf48-eb7df6a50718
+
+	measure Rejected = CALCULATE ( [Applications], Applications[Status] = "Rejected" )
+		formatString: #,0
+		displayFolder: 1 Funnel
+		lineageTag: a5412465-1f4b-559f-bb1a-d48834acfd37
+
+	measure 'Approval Rate %' = DIVIDE ( [Approved], [Applications] )
+		formatString: 0.0%
+		displayFolder: 1 Funnel
+		lineageTag: d417693b-2c34-575f-b98f-63a0ffee0ba2
+
+	measure 'Requested Amount' = SUM ( Applications[RequestedAmount] )
+		formatString: \$#,0
+		displayFolder: 2 Volume
+		lineageTag: 7e8ec375-4700-57ed-93b4-c4e0e89069b5
+
+	measure 'Approved Amount' = SUM ( Applications[ApprovedAmount] )
+		formatString: \$#,0
+		displayFolder: 2 Volume
+		lineageTag: df3f9f38-a76c-534e-bbac-e5d8f649dca3
+
+	measure 'Avg Ticket (approved)' = DIVIDE ( [Approved Amount], [Approved] )
+		formatString: \$#,0
+		displayFolder: 2 Volume
+		lineageTag: 025b2cb5-b129-5809-ac11-d560f39d195c
+
+	/// Simple average of approved loans' annual rates
+	measure 'Avg Interest Rate' = AVERAGE ( Applications[InterestRate] )
+		formatString: 0.00%
+		displayFolder: 3 Pricing
+		lineageTag: fbae7627-9209-5998-95c2-27017e639bb4
+
+	/// Amount-weighted interest rate
+	measure 'Weighted Avg Rate' = DIVIDE ( SUMX ( Applications, Applications[ApprovedAmount] * Applications[InterestRate] ), [Approved Amount] )
+		formatString: 0.00%
+		displayFolder: 3 Pricing
+		lineageTag: 424e1c56-9c3b-5939-8908-785bedbebf03
+
+	measure 'Avg Processing Days' = AVERAGE ( Applications[ProcessingDays] )
+		formatString: 0.0
+		displayFolder: 4 Operations
+		lineageTag: 96fcebb2-9583-5572-b70d-edc0e8d497e5
+
+	measure 'Within SLA %' = DIVIDE ( SUM ( Applications[WithinSLA] ), [Applications] )
+		formatString: 0.0%
+		displayFolder: 4 Operations
+		lineageTag: 9d8f04a2-af11-5411-b372-121705f96919
+
+	measure 'Docs Rejection Share %' = DIVIDE ( CALCULATE ( [Rejected], Applications[RejectionReason] = "Incomplete documents" ), [Rejected] )
+		formatString: 0.0%
+		displayFolder: 4 Operations
+		lineageTag: c3fed470-63e1-5c01-8194-d8f8c6469621
+
+	measure 'Applications YoY %' =
+			VAR yr = MAX ( 'Date'[Year] )
+			VAR cur = CALCULATE ( [Applications], 'Date'[Year] = yr )
+			VAR prev = CALCULATE ( [Applications], 'Date'[Year] = yr - 1 )
+			RETURN DIVIDE ( cur - prev, prev )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 5 Time intelligence
+		lineageTag: 37f02679-a10c-5877-9cb8-9616fdaa903c
+
+	measure 'Approved Amount YoY %' =
+			VAR yr = MAX ( 'Date'[Year] )
+			VAR cur = CALCULATE ( [Approved Amount], 'Date'[Year] = yr )
+			VAR prev = CALCULATE ( [Approved Amount], 'Date'[Year] = yr - 1 )
+			RETURN DIVIDE ( cur - prev, prev )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 5 Time intelligence
+		lineageTag: d2b611c6-418e-582d-a0ad-5c099eef0643
+
+	measure 'Approved Amount YTD' = TOTALYTD ( [Approved Amount], 'Date'[Date] )
+		formatString: \$#,0
+		displayFolder: 5 Time intelligence
+		lineageTag: 50ad1078-5240-5adb-9fea-46e55835d7a0
+
+	column Dummy
+		dataType: string
+		isHidden
+		lineageTag: 202e5d6e-c090-5ea9-acc2-c1e9e486a65e
+		summarizeBy: none
+		sourceColumn: Dummy
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Dummy = text], {})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table
+

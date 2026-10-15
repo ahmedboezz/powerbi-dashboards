@@ -1,0 +1,71 @@
+table Campaigns
+	lineageTag: 6288374e-cf8a-5d62-8a42-631371ad391b
+
+	column CampaignID
+		dataType: string
+		lineageTag: 4ce7a553-13e8-50f7-9902-99d576408517
+		summarizeBy: none
+		sourceColumn: CampaignID
+
+		annotation SummarizationSetBy = Automatic
+
+	column CampaignName
+		dataType: string
+		lineageTag: 63c4e3d1-ffa8-5ec4-b417-0cadc9119cfe
+		summarizeBy: none
+		sourceColumn: CampaignName
+
+		annotation SummarizationSetBy = Automatic
+
+	column Channel
+		dataType: string
+		lineageTag: c10af4c1-0de1-52cc-ade7-4dae84651b68
+		summarizeBy: none
+		sourceColumn: Channel
+
+		annotation SummarizationSetBy = Automatic
+
+	column Objective
+		dataType: string
+		lineageTag: 41ecd337-fc80-51eb-a0b8-c1dfd77343a2
+		summarizeBy: none
+		sourceColumn: Objective
+
+		annotation SummarizationSetBy = Automatic
+
+	column StartDate
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: ebb3b281-92d6-5392-8104-1b8cadcbb6ee
+		summarizeBy: none
+		sourceColumn: StartDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column EndDate
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 63d56e14-f5c8-5767-9fc5-69a4fcdd1701
+		summarizeBy: none
+		sourceColumn: EndDate
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition Campaigns = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "campaigns.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+
+				    ChMap = [snapchat = "Snapchat", #"meta ads" = "Meta (Instagram/Facebook)", #"google search" = "Google Search", tiktok = "TikTok"],
+				    Result = Table.TransformColumns(Promoted, {{"Channel", each Record.FieldOrDefault(ChMap, Text.Lower(_), _), type text},
+				               {"StartDate", Date.From, type date}, {"EndDate", Date.From, type date}})
+				in
+				    Result
+
+	annotation PBI_ResultType = Table

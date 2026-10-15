@@ -1,0 +1,97 @@
+/// One row per vehicle per working day (telematics)
+table Trips
+	lineageTag: 298d83c1-bbe9-5b19-b163-9ff0715e5c62
+
+	column Date
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 49225688-fbf0-5211-8afd-de70dac2a91d
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column VehicleID
+		dataType: string
+		lineageTag: 82be0d77-8238-5a39-8699-8199bd93e302
+		summarizeBy: none
+		sourceColumn: VehicleID
+
+		annotation SummarizationSetBy = Automatic
+
+	column DriverID
+		dataType: string
+		lineageTag: 34b2cb9a-8222-502c-a9a3-0c3f64969a5d
+		summarizeBy: none
+		sourceColumn: DriverID
+
+		annotation SummarizationSetBy = Automatic
+
+	column Km
+		dataType: double
+		formatString: #,0
+		lineageTag: d227b21b-638b-52b9-b056-d26c462f70a2
+		summarizeBy: sum
+		sourceColumn: Km
+
+		annotation SummarizationSetBy = Automatic
+
+	column Deliveries
+		dataType: int64
+		formatString: #,0
+		lineageTag: dca26277-84a5-5550-857f-c7fb6b407067
+		summarizeBy: sum
+		sourceColumn: Deliveries
+
+		annotation SummarizationSetBy = Automatic
+
+	column FuelLiters
+		dataType: double
+		formatString: #,0
+		lineageTag: 65073314-cd37-552e-bc65-ddc7a997cdff
+		summarizeBy: sum
+		sourceColumn: FuelLiters
+
+		annotation SummarizationSetBy = Automatic
+
+	column IdleMinutes
+		dataType: int64
+		formatString: #,0
+		lineageTag: 2c902998-7332-504e-97c7-25ba0ee76e63
+		summarizeBy: sum
+		sourceColumn: IdleMinutes
+
+		annotation SummarizationSetBy = Automatic
+
+	column FuelCost
+		dataType: double
+		formatString: #,0
+		lineageTag: ca3e9fba-c6f6-5257-9c91-5e190d3f64b4
+		summarizeBy: sum
+		sourceColumn: FuelCost
+
+		annotation SummarizationSetBy = Automatic
+
+	partition Trips = m
+		mode: import
+		source =
+				let
+				    Source = Csv.Document(File.Contents(DataFolder & "telematics_trips_2025.csv"), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+				    Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true]),
+				    Typed = Table.TransformColumnTypes(Promoted, {{"Date", type date}, {"Km", type number}, {"Deliveries", Int64.Type},
+				              {"FuelLiters", type number}, {"IdleMinutes", Int64.Type}}, "en-US"),
+				    // telematics glitches: duplicated pings and negative odometer deltas
+				    Dedup = Table.Distinct(Typed, {"Date", "VehicleID"}),
+				    ValidKm = Table.SelectRows(Dedup, each [Km] >= 0 and [Km] <= 1200),
+				    Fuel = Table.NestedJoin(ValidKm, {"VehicleID"}, Vehicles, {"VehicleID"}, "V", JoinKind.LeftOuter),
+				    FuelType = Table.ExpandTableColumn(Fuel, "V", {"FuelType"}),
+				    Prices = Table.NestedJoin(FuelType, {"FuelType"}, #"Fuel Prices", {"FuelType"}, "P", JoinKind.LeftOuter),
+				    Price = Table.ExpandTableColumn(Prices, "P", {"PricePerLiter"}),
+				    Cost = Table.AddColumn(Price, "FuelCost", each [FuelLiters] * [PricePerLiter], type number),
+				    Result = Table.RemoveColumns(Cost, {"FuelType", "PricePerLiter"})
+				in
+				    Result
+
+	annotation PBI_ResultType = Table

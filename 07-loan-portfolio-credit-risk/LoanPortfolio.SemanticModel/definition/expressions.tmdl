@@ -1,0 +1,4 @@
+expression DataFolder = "F:\CV\DataAnalyst\PowerBI_Projects\01_Loan_Portfolio_Credit_Risk\data\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: fbd212a3-ba4c-5060-bd09-eb8d6a7230ea
+
+	annotation PBI_ResultType = Text

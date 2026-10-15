@@ -1,0 +1,119 @@
+table _Measures
+	lineageTag: b91f61c3-2ce2-5851-a164-812972f2a7d4
+
+	measure Revenue = SUM ( Sales[Revenue] )
+		formatString: \$#,0
+		displayFolder: 1 Sales
+		lineageTag: 532f067e-4e91-541b-8b25-7e31f1986475
+
+	measure Profit = SUM ( Sales[Profit] )
+		formatString: \$#,0
+		displayFolder: 1 Sales
+		lineageTag: 56d92664-2116-5d00-96ad-157dab6bec05
+
+	measure Orders = COUNTROWS ( Sales )
+		formatString: #,0
+		displayFolder: 1 Sales
+		lineageTag: f140dbf6-85ea-5abe-a3d8-5b2954a120f9
+
+	measure 'Units Sold' = SUM ( Sales[Quantity] )
+		formatString: #,0
+		displayFolder: 1 Sales
+		lineageTag: df0595eb-dcf6-5962-9e34-045412981f8f
+
+	measure 'Avg Order Value' = DIVIDE ( [Revenue], [Orders] )
+		formatString: \$#,0.00
+		displayFolder: 1 Sales
+		lineageTag: 76bce771-bed6-5266-8f03-28e848f1212f
+
+	measure 'Profit Margin %' = DIVIDE ( [Profit], [Revenue] )
+		formatString: 0.0%
+		displayFolder: 1 Sales
+		lineageTag: 7d443649-c5d0-5d79-8b4d-97e88fc5fad6
+
+	measure 'Returned Orders' = SUM ( Sales[Returned] )
+		formatString: #,0
+		displayFolder: 2 Returns & CX
+		lineageTag: a69d696a-a03b-538c-8a3a-016ec44c6488
+
+	measure 'Return Rate %' = DIVIDE ( [Returned Orders], [Orders] )
+		formatString: 0.0%
+		displayFolder: 2 Returns & CX
+		lineageTag: 6efa2835-787b-5671-b0df-09d5e408ea46
+
+	measure 'Avg Rating' = AVERAGE ( Sales[Rating] )
+		formatString: 0.00
+		displayFolder: 2 Returns & CX
+		lineageTag: b4fc0156-a754-5d38-9636-35afefcc841e
+
+	measure 'Avg Delivery Days' = AVERAGE ( Sales[DeliveryDays] )
+		formatString: 0.0
+		displayFolder: 2 Returns & CX
+		lineageTag: 925f937a-050d-5df3-8f1e-13cfdd207be4
+
+	/// Revenue in the same period of the previous year
+	measure 'Revenue PY' = CALCULATE ( [Revenue], SAMEPERIODLASTYEAR ( 'Date'[Date] ) )
+		formatString: \$#,0
+		displayFolder: 3 Time intelligence
+		lineageTag: 28184121-ac65-504a-b68d-5756ef114e32
+
+	/// Latest year in context vs the year before
+	measure 'Revenue YoY %' =
+			VAR yr = MAX ( 'Date'[Year] )
+			VAR cur = CALCULATE ( [Revenue], 'Date'[Year] = yr )
+			VAR prev = CALCULATE ( [Revenue], 'Date'[Year] = yr - 1 )
+			RETURN DIVIDE ( cur - prev, prev )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 3 Time intelligence
+		lineageTag: f6ae779f-a3d9-577f-a0bf-1fae27bf7ebc
+
+	measure 'Orders PY' = CALCULATE ( [Orders], SAMEPERIODLASTYEAR ( 'Date'[Date] ) )
+		formatString: #,0
+		displayFolder: 3 Time intelligence
+		lineageTag: 153cd0f7-44b4-5fe0-b10d-8f6a817a1891
+
+	/// Latest year in context vs the year before
+	measure 'Orders YoY %' =
+			VAR yr = MAX ( 'Date'[Year] )
+			VAR cur = CALCULATE ( [Orders], 'Date'[Year] = yr )
+			VAR prev = CALCULATE ( [Orders], 'Date'[Year] = yr - 1 )
+			RETURN DIVIDE ( cur - prev, prev )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 3 Time intelligence
+		lineageTag: 640524b6-2d82-5a15-b478-485b117fdffe
+
+	measure 'Revenue YTD' = TOTALYTD ( [Revenue], 'Date'[Date] )
+		formatString: \$#,0
+		displayFolder: 3 Time intelligence
+		lineageTag: bb3adc91-7447-5051-aef5-85a3e5d8e12f
+
+	measure 'Mobile App Share %' = DIVIDE ( CALCULATE ( [Revenue], Sales[Channel] = "Mobile App" ), [Revenue] )
+		formatString: 0.0%
+		displayFolder: 1 Sales
+		lineageTag: e94df454-8dfd-5c6c-8d3d-06f3dd058486
+
+	/// Rank of the product by revenue across all products
+	measure 'Product Rank' = IF ( HASONEVALUE ( Products[Product] ), RANKX ( ALL ( Products ), [Revenue] ) )
+		formatString: 0
+		displayFolder: 1 Sales
+		lineageTag: 98db5e31-21cf-5178-a95d-9e8a59acfaf6
+
+	column Dummy
+		dataType: string
+		isHidden
+		lineageTag: 202e5d6e-c090-5ea9-acc2-c1e9e486a65e
+		summarizeBy: none
+		sourceColumn: Dummy
+
+		annotation SummarizationSetBy = Automatic
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [Dummy = text], {})
+				in
+				    Source
+
+	annotation PBI_ResultType = Table
+

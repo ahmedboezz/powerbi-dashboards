@@ -1,0 +1,18 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-US
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 0
+
+annotation PBI_QueryOrder = ["DataFolder", "Projects", "Progress", "Change Orders", "Risks", "Date", "_Measures"]
+
+ref table Projects
+ref table Progress
+ref table 'Change Orders'
+ref table Risks
+ref table Date
+ref table _Measures

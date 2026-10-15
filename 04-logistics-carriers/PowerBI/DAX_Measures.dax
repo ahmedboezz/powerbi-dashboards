@@ -1,0 +1,67 @@
+// Logistics & Carrier Performance - DAX measures (table _Measures)
+
+// [1 Volume]
+Shipments =
+    COUNTROWS ( Shipments )
+
+// [1 Volume]
+Total Weight (kg) =
+    SUM ( Shipments[WeightKg] )
+
+// [2 Service]
+On-Time Shipments =
+    SUM ( Shipments[OnTime] )
+
+// [2 Service]
+On-Time % =
+    DIVIDE ( [On-Time Shipments], [Shipments] )
+
+// [2 Service]
+Late Shipments =
+    [Shipments] - [On-Time Shipments]
+
+// [2 Service]
+Avg Delay (late only) =
+    AVERAGEX ( FILTER ( Shipments, Shipments[DelayDays] > 0 ), Shipments[DelayDays] )
+
+// [2 Service]
+Avg Transit Days =
+    AVERAGE ( Shipments[ActualDays] )
+
+// [2 Service]
+Damage Rate % =
+    DIVIDE ( SUM ( Shipments[Damaged] ), [Shipments] )
+
+// [3 Cost]
+Freight Cost =
+    SUM ( Shipments[ShippingCost] )
+
+// [3 Cost]
+Cost per Shipment =
+    DIVIDE ( [Freight Cost], [Shipments] )
+
+// [3 Cost]
+Cost per Kg =
+    DIVIDE ( [Freight Cost], [Total Weight (kg)] )
+
+// [3 Cost]
+Cost of Late Shipments =
+    CALCULATE ( [Freight Cost], Shipments[OnTime] = 0 )
+
+// [4 Time intelligence]
+Shipments YoY % =
+    VAR yr = MAX ( 'Date'[Year] )
+VAR cur = CALCULATE ( [Shipments], 'Date'[Year] = yr )
+VAR prev = CALCULATE ( [Shipments], 'Date'[Year] = yr - 1 )
+RETURN DIVIDE ( cur - prev, prev )
+
+// [4 Time intelligence]
+On-Time % PY =
+    CALCULATE ( [On-Time %], SAMEPERIODLASTYEAR ( 'Date'[Date] ) )
+
+// [5 Scorecard] Weighted 0-100 score: 70% on-time, 15% damage, 15% relative cost
+Carrier Score =
+    VAR otd = [On-Time %]
+VAR dmg = [Damage Rate %]
+VAR cpk = DIVIDE ( [Cost per Kg], CALCULATE ( [Cost per Kg], ALL ( Carriers ) ) )
+RETURN ROUND ( otd * 70 + ( 1 - dmg * 20 ) * 15 + ( 2 - cpk ) * 15, 1 )
