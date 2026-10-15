@@ -51,3 +51,6 @@ More projects: [Excel](https://github.com/ahmedsalamsali/excel-dashboards) · [S
 
 ---
 **Ahmed Abdulsalam** · Data Analyst · Jeddah, Saudi Arabia · a@ezzprx.com · [LinkedIn](https://linkedin.com/in/ahmedboezz)
+
+---
+© 2026 Ahmed Abdulsalam. All rights reserved. See [LICENSE](LICENSE).

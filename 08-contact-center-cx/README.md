@@ -38,3 +38,5 @@ See also: [Demand forecast & Erlang C staffing on the same data](https://github.
 2. Click **Refresh now** (or Home → Refresh → *Schema and data*). If you moved the folder: Transform data → Edit parameters → `DataFolder`.
 3. Screenshots of every page are in [`screenshots/`](screenshots).
 
+---
+© 2026 Ahmed Abdulsalam. All rights reserved. See [LICENSE](../LICENSE).

@@ -61,3 +61,6 @@
 ---
 *All data is simulated for portfolio purposes; company names are fictional.*  
 *Prepared by Ahmed Abdulsalam - Data Analyst.*
+
+---
+© 2026 Ahmed Abdulsalam. All rights reserved. See [LICENSE](../LICENSE).
