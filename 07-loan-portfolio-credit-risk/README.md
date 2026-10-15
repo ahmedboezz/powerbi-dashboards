@@ -35,7 +35,7 @@ Risk-committee dashboard for a Saudi consumer-finance company: portfolio size, N
 * Early delinquency spikes after Eid (April).
 
 Every measure was validated against an independent Python calculation (DAX queries on the model).
-See also: [Logistic-regression driver analysis on the same data](https://github.com/ahmedsalamsali/python-data-analysis/tree/main/03-credit-default-drivers).
+See also: [Logistic-regression driver analysis on the same data](https://github.com/ahmedboezz/python-data-analysis/tree/main/03-credit-default-drivers).
 
 ## How to open
 1. Install a recent **Power BI Desktop** and open `LoanPortfolio.pbip`. The project is saved in the Power BI Project format (TMDL model + PBIR report), so it's readable in Git.

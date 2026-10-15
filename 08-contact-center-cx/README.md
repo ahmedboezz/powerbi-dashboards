@@ -31,7 +31,7 @@
 * New agents (0-6 months): AHT 459s vs 375s and FCR 62% vs 72%.
 * CSAT 76% when answered within 20s vs 7% after 5 minutes. WhatsApp share grew from 11% to 27%.
 
-See also: [Demand forecast & Erlang C staffing on the same data](https://github.com/ahmedsalamsali/python-data-analysis/tree/main/04-call-volume-forecast).
+See also: [Demand forecast & Erlang C staffing on the same data](https://github.com/ahmedboezz/python-data-analysis/tree/main/04-call-volume-forecast).
 
 ## How to open
 1. Install a recent **Power BI Desktop** and open `ContactCenter.pbip`. The project is saved in the Power BI Project format (TMDL model + PBIR report), so it's readable in Git.
