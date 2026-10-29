@@ -47,7 +47,7 @@ Eleven Power BI reports built on star-schema models with DAX measures. They are 
 ### Construction Portfolio (EVM)
 ![Construction Portfolio (EVM)](11-construction-evm/screenshots/page1_portfolio.png)
 
-More projects: [Excel](https://github.com/ahmedboezz/excel-dashboards) · [SQL](https://github.com/ahmedboezz/sql-projects) · [Python](https://github.com/ahmedboezz/python-data-analysis)
+More projects: [Excel](https://github.com/ahmedboezz/excel-dashboards) · [SQL](https://github.com/ahmedboezz/sql-projects)
 
 ---
 **Ahmed Abdulsalam** · Data Analyst · Jeddah, Saudi Arabia · a@ezzprx.com · [LinkedIn](https://linkedin.com/in/ahmedboezz)
